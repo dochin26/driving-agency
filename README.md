@@ -204,6 +204,9 @@ driving-agency/
 - **driving_records**: 運転記録
 - **daily_report_settings**: 日報範囲設定
 
+### ER図
+<img width="12006" height="8137" alt="driving-agency-er" src="https://github.com/user-attachments/assets/4dd10fad-f4a9-4a0a-b06d-e97440b72f5e" />
+
 ## 画面設計
 
 詳細は以下のドキュメントを参照してください：
