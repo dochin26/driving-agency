@@ -1,45 +1,51 @@
-# Git関連
-.git
-.gitignore
+# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
-# ログファイル
-log/*
-tmp/*
-*.log
+# Ignore git directory.
+/.git/
+/.gitignore
 
-# データベースファイル
-*.sqlite3
-*.sqlite3-*
+# Ignore bundler config.
+/.bundle
 
-# 環境変数
-.env
-.env.local
+# Ignore all environment files.
+/.env*
 
-# Node modules
-node_modules/
+# Ignore all default key files.
+/config/master.key
+/config/credentials/*.key
 
-# テストカバレッジ
-coverage/
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
 
-# エディタ設定
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/.keep
 
-# OS固有
-.DS_Store
-Thumbs.db
+# Ignore storage (uploaded files in development and any SQLite databases).
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
 
-# ビルド成果物
-public/assets/
-public/packs/
-public/packs-test/
+# Ignore assets.
+/node_modules/
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/public/assets
 
-# 依存関係キャッシュ
-vendor/bundle/
+# Ignore CI service files.
+/.github
 
-# その他
-.byebug_history
-.ruby-version
+# Ignore Kamal files.
+/config/deploy*.yml
+/.kamal
+
+# Ignore development files
+/.devcontainer
+
+# Ignore Docker-related files
+/.dockerignore
+/Dockerfile*
