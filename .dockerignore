@@ -1,0 +1,45 @@
+# Git関連
+.git
+.gitignore
+
+# ログファイル
+log/*
+tmp/*
+*.log
+
+# データベースファイル
+*.sqlite3
+*.sqlite3-*
+
+# 環境変数
+.env
+.env.local
+
+# Node modules
+node_modules/
+
+# テストカバレッジ
+coverage/
+
+# エディタ設定
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS固有
+.DS_Store
+Thumbs.db
+
+# ビルド成果物
+public/assets/
+public/packs/
+public/packs-test/
+
+# 依存関係キャッシュ
+vendor/bundle/
+
+# その他
+.byebug_history
+.ruby-version
