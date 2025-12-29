@@ -1,0 +1,49 @@
+<div class="min-h-screen bg-base-200">
+  <%= render "shared/navbar" %>
+
+  <div class="container mx-auto p-4 max-w-2xl">
+    <div class="breadcrumbs text-sm mb-4">
+      <ul>
+        <li><%= link_to "ダッシュボード", dashboard_path %></li>
+        <li><%= link_to "車両管理", admin_vehicles_path %></li>
+        <li>新規登録</li>
+      </ul>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-6">車両 新規登録</h2>
+
+        <%= form_with(model: [:admin, @vehicle], class: "space-y-4") do |f| %>
+          <% if @vehicle.errors.any? %>
+            <div class="alert alert-error">
+              <div>
+                <span class="font-bold"><%= pluralize(@vehicle.errors.count, "個") %>のエラーがあります：</span>
+                <ul class="list-disc list-inside mt-2">
+                  <% @vehicle.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="form-control">
+            <%= f.label :vehicle_number, "車両番号（必須）", class: "label" %>
+            <%= f.text_field :vehicle_number, class: "input input-bordered w-full", placeholder: "例：1号車" %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :vehicle_info, "車両情報", class: "label" %>
+            <%= f.text_field :vehicle_info, class: "input input-bordered w-full", placeholder: "例：トヨタ プリウス" %>
+          </div>
+
+          <div class="card-actions justify-end mt-6">
+            <%= link_to "キャンセル", admin_vehicles_path, class: "btn btn-ghost" %>
+            <%= f.submit "登録する", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
