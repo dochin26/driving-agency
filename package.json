@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=/assets",
-    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify"
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --config ./config/tailwind.config.js --minify --content './app/views/**/*.erb'"
   },
   "keywords": [],
   "author": "",
