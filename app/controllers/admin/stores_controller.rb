@@ -1,7 +1,5 @@
 module Admin
-  class StoresController < ApplicationController
-    before_action :authenticate_driver!
-    before_action :authorize_admin!
+  class StoresController < BaseController
     before_action :set_store, only: [ :show, :edit, :update, :destroy ]
 
     def index
@@ -61,12 +59,6 @@ module Admin
 
     def store_params
       params.require(:store).permit(:name, :address, :latitude, :longitude)
-    end
-
-    def authorize_admin!
-      unless current_driver.admin?
-        redirect_to root_path, alert: "管理者権限が必要です。"
-      end
     end
   end
 end

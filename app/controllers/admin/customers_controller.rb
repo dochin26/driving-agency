@@ -1,7 +1,5 @@
 module Admin
-  class CustomersController < ApplicationController
-    before_action :authenticate_driver!
-    before_action :authorize_admin!
+  class CustomersController < BaseController
     before_action :set_customer, only: [ :show, :edit, :update, :destroy ]
 
     def index
@@ -61,12 +59,6 @@ module Admin
 
     def customer_params
       params.require(:customer).permit(:name, :address, :latitude, :longitude, :phone, :notes)
-    end
-
-    def authorize_admin!
-      unless current_driver.admin?
-        redirect_to root_path, alert: "管理者権限が必要です。"
-      end
     end
   end
 end
