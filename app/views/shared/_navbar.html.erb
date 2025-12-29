@@ -1,9 +1,38 @@
 <div class="navbar bg-primary text-primary-content">
   <div class="flex-1">
-    <%= link_to "運転代行管理システム", dashboard_path, class: "btn btn-ghost text-xl" %>
+    <%= link_to "運転代行管理システム", dashboard_path, class: "btn btn-ghost text-xl normal-case" %>
   </div>
   <div class="flex-none">
-    <ul class="menu menu-horizontal px-1">
+    <!-- ハンバーガーメニュー (スマホ) -->
+    <div class="dropdown dropdown-end md:hidden">
+      <label tabindex="0" class="btn btn-ghost btn-square">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </label>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow bg-base-100 rounded-box w-52">
+        <li><%= link_to "ダッシュボード", dashboard_path %></li>
+        <li><%= link_to "運転記録", driving_records_path %></li>
+        <li><%= link_to "日報", daily_report_driving_records_path %></li>
+        <% if current_driver.admin? %>
+          <li>
+            <details>
+              <summary>管理</summary>
+              <ul>
+                <li><%= link_to "ドライバー", admin_drivers_path %></li>
+                <li><%= link_to "車両", admin_vehicles_path %></li>
+                <li><%= link_to "店舗", admin_stores_path %></li>
+                <li><%= link_to "顧客", admin_customers_path %></li>
+              </ul>
+            </details>
+          </li>
+        <% end %>
+        <li><%= button_to "ログアウト", destroy_driver_session_path, method: :delete, class: "w-full text-left" %></li>
+      </ul>
+    </div>
+
+    <!-- デスクトップメニュー -->
+    <ul class="menu menu-horizontal px-1 hidden md:flex">
       <li><%= link_to "ダッシュボード", dashboard_path %></li>
       <li><%= link_to "運転記録", driving_records_path %></li>
       <li><%= link_to "日報", daily_report_driving_records_path %></li>
@@ -11,7 +40,7 @@
         <li>
           <details>
             <summary>管理</summary>
-            <ul class="bg-base-100 rounded-t-none p-2 z-10">
+            <ul class="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow">
               <li><%= link_to "ドライバー", admin_drivers_path %></li>
               <li><%= link_to "車両", admin_vehicles_path %></li>
               <li><%= link_to "店舗", admin_stores_path %></li>
