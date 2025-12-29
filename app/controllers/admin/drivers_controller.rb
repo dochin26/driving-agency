@@ -78,7 +78,7 @@ module Admin
     end
 
     def driver_params
-      permitted_params = [:name, :email, :password, :password_confirmation]
+      permitted_params = [ :name, :email, :password, :password_confirmation ]
       # 管理者のみが権限を変更可能
       permitted_params << :role if current_driver.admin?
       params.require(:driver).permit(permitted_params)
