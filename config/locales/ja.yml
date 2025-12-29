@@ -1,0 +1,14 @@
+ja:
+  activerecord:
+    attributes:
+      driver:
+        roles:
+          driver: "ドライバー"
+          admin: "管理者"
+    models:
+      driver: "ドライバー"
+      vehicle: "車両"
+      store: "店舗"
+      customer: "顧客"
+      driving_record: "運転記録"
+      daily_report_setting: "日報範囲設定"

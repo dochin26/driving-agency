@@ -1,0 +1,69 @@
+<div class="min-h-screen bg-base-200">
+  <%= render "shared/navbar" %>
+
+  <div class="container mx-auto p-4 max-w-2xl">
+    <div class="breadcrumbs text-sm mb-4">
+      <ul>
+        <li><%= link_to "ダッシュボード", dashboard_path %></li>
+        <li><%= link_to "ドライバー管理", admin_drivers_path %></li>
+        <li>編集</li>
+      </ul>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-6">ドライバー 編集</h2>
+
+        <%= form_with(model: [:admin, @driver], class: "space-y-4") do |f| %>
+          <% if @driver.errors.any? %>
+            <div class="alert alert-error">
+              <div>
+                <span class="font-bold"><%= pluralize(@driver.errors.count, "個") %>のエラーがあります：</span>
+                <ul class="list-disc list-inside mt-2">
+                  <% @driver.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="form-control">
+            <%= f.label :name, "名前（必須）", class: "label" %>
+            <%= f.text_field :name, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :email, "メールアドレス（必須）", class: "label" %>
+            <%= f.email_field :email, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :role, "権限（必須）", class: "label" %>
+            <%= f.select :role, Driver.roles.keys.map { |k| [I18n.t("activerecord.attributes.driver.roles.#{k}"), k] }, {}, class: "select select-bordered w-full" %>
+          </div>
+
+          <div class="divider">パスワード変更（変更する場合のみ入力）</div>
+
+          <div class="form-control">
+            <%= f.label :password, "新しいパスワード", class: "label" %>
+            <%= f.password_field :password, autocomplete: "new-password", class: "input input-bordered w-full", placeholder: "変更しない場合は空欄" %>
+            <label class="label">
+              <span class="label-text-alt">6文字以上で入力してください</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :password_confirmation, "新しいパスワード（確認）", class: "label" %>
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input input-bordered w-full", placeholder: "変更しない場合は空欄" %>
+          </div>
+
+          <div class="card-actions justify-end mt-6">
+            <%= link_to "キャンセル", admin_drivers_path, class: "btn btn-ghost" %>
+            <%= f.submit "更新する", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
