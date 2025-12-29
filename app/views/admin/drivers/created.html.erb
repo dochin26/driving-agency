@@ -1,0 +1,65 @@
+<div class="min-h-screen bg-base-200">
+  <%= render "shared/navbar" %>
+
+  <div class="container mx-auto p-4 max-w-2xl">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-6 text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          ドライバー登録完了
+        </h2>
+
+        <div class="space-y-4">
+          <div class="alert alert-success">
+            <span><%= @driver.name %>さんを登録しました。</span>
+          </div>
+
+          <div class="alert alert-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <div class="font-bold">初期パスワード（必ずメモしてください）</div>
+              <div class="mt-2 p-4 bg-base-100 rounded font-mono text-2xl select-all">
+                <%= @generated_password %>
+              </div>
+              <div class="mt-2 text-sm">
+                このパスワードは再表示できません。必ずドライバーに伝えてください。
+              </div>
+            </div>
+          </div>
+
+          <div class="divider">登録情報</div>
+
+          <div class="space-y-2">
+            <div class="flex">
+              <span class="font-bold w-32">名前:</span>
+              <span><%= @driver.name %></span>
+            </div>
+            <div class="flex">
+              <span class="font-bold w-32">メール:</span>
+              <span><%= @driver.email %></span>
+            </div>
+            <div class="flex">
+              <span class="font-bold w-32">権限:</span>
+              <span>
+                <% if @driver.admin? %>
+                  <span class="badge badge-primary">管理者</span>
+                <% else %>
+                  <span class="badge badge-ghost">ドライバー</span>
+                <% end %>
+              </span>
+            </div>
+          </div>
+
+          <div class="card-actions justify-end mt-6">
+            <%= link_to "ドライバー一覧に戻る", admin_drivers_path, class: "btn btn-primary" %>
+            <%= link_to "続けて登録", new_admin_driver_path, class: "btn btn-ghost" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

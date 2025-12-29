@@ -18,7 +18,11 @@ Rails.application.routes.draw do
 
   # Admin routes
   namespace :admin do
-    resources :drivers
+    resources :drivers do
+      member do
+        get :created
+      end
+    end
     resources :vehicles
     resources :stores
     resources :customers
