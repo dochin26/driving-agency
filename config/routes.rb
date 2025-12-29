@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     resources :vehicles
     resources :stores
     resources :customers
-    resources :daily_report_settings, only: [:index, :edit, :update]
+    resources :daily_report_settings, only: [ :index, :edit, :update ]
   end
 
   # Health check
