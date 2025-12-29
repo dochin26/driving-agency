@@ -49,7 +49,7 @@ gem "sentry-rails"
 gem "geocoder", "~> 1.8"
 
 # Environment variables
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 # Pagination
 gem "kaminari", "~> 1.2"
@@ -60,6 +60,7 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities
   gem "brakeman", require: false
+  gem "bundler-audit", require: false
 
   # Omakase Ruby styling
   gem "rubocop-rails-omakase", require: false
