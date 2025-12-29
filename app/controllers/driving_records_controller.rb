@@ -57,6 +57,36 @@ class DrivingRecordsController < ApplicationController
     end
   end
 
+  def daily_report
+    @date = params[:date] ? Date.parse(params[:date]) : Date.current
+    @vehicle_id = params[:vehicle_id]
+
+    # 日報範囲設定を取得
+    @setting = DailyReportSetting.first || DailyReportSetting.create(start_hour: 19, end_hour: 28)
+
+    # 日報の開始・終了日時を計算
+    start_datetime = @date.to_time.change(hour: @setting.start_hour)
+    # end_hourが24以上の場合は翌日
+    if @setting.end_hour >= 24
+      end_datetime = (@date + 1.day).to_time.change(hour: @setting.end_hour - 24)
+    else
+      end_datetime = @date.to_time.change(hour: @setting.end_hour)
+    end
+
+    # 日報データを取得
+    @records = DrivingRecord.includes(:driver, :vehicle, :store, :customer)
+                            .where(departure_datetime: start_datetime...end_datetime)
+
+    @records = @records.where(vehicle_id: @vehicle_id) if @vehicle_id.present?
+    @records = @records.order(:departure_datetime)
+
+    # 合計値を計算
+    @total_distance = @records.sum(:distance)
+    @total_amount = @records.sum(:amount)
+
+    @vehicles = Vehicle.all
+  end
+
   private
 
   def set_driving_record
