@@ -1,0 +1,25 @@
+<div class="navbar bg-primary text-primary-content">
+  <div class="flex-1">
+    <%= link_to "運転代行管理システム", dashboard_path, class: "btn btn-ghost text-xl" %>
+  </div>
+  <div class="flex-none">
+    <ul class="menu menu-horizontal px-1">
+      <li><%= link_to "ダッシュボード", dashboard_path %></li>
+      <li><%= link_to "運転記録", driving_records_path %></li>
+      <% if current_driver.admin? %>
+        <li>
+          <details>
+            <summary>管理</summary>
+            <ul class="bg-base-100 rounded-t-none p-2 z-10">
+              <li><%= link_to "ドライバー", admin_drivers_path %></li>
+              <li><%= link_to "車両", admin_vehicles_path %></li>
+              <li><%= link_to "店舗", admin_stores_path %></li>
+              <li><%= link_to "顧客", admin_customers_path %></li>
+            </ul>
+          </details>
+        </li>
+      <% end %>
+      <li><%= button_to "ログアウト", destroy_driver_session_path, method: :delete, class: "btn btn-ghost btn-sm" %></li>
+    </ul>
+  </div>
+</div>

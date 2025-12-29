@@ -1,0 +1,53 @@
+<div class="min-h-screen bg-base-200">
+  <%= render "shared/navbar" %>
+
+  <div class="container mx-auto p-4">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">運転記録一覧</h1>
+      <%= link_to "新規登録", new_driving_record_path, class: "btn btn-primary" %>
+    </div>
+
+    <% if @driving_records.any? %>
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>出発日時</th>
+              <th>店舗</th>
+              <th>目的地</th>
+              <th>走行距離</th>
+              <th>金額</th>
+              <th>車両</th>
+              <th>ドライバー</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @driving_records.each do |record| %>
+              <tr>
+                <td><%= record.departure_datetime.strftime("%Y/%m/%d %H:%M") %></td>
+                <td><%= record.store.name %></td>
+                <td><%= record.destination %></td>
+                <td><%= record.distance %>km</td>
+                <td>¥<%= number_with_delimiter(record.amount) %></td>
+                <td><%= record.vehicle.vehicle_number %></td>
+                <td><%= record.driver.name %></td>
+                <td>
+                  <%= link_to "詳細", driving_record_path(record), class: "btn btn-sm btn-info" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4">
+        <%= paginate @driving_records %>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        <span>運転記録がありません。</span>
+      </div>
+    <% end %>
+  </div>
+</div>

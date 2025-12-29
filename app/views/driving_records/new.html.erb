@@ -1,0 +1,171 @@
+<div class="min-h-screen bg-base-200">
+  <!-- ナビゲーションバー -->
+  <%= render "shared/navbar" %>
+
+  <!-- メインコンテンツ -->
+  <div class="container mx-auto p-4 max-w-4xl">
+    <div class="breadcrumbs text-sm mb-4">
+      <ul>
+        <li><%= link_to "ダッシュボード", dashboard_path %></li>
+        <li><%= link_to "運転記録", driving_records_path %></li>
+        <li>新規登録</li>
+      </ul>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-6">運転記録 新規登録</h2>
+
+        <%= form_with(model: @driving_record, class: "space-y-4", data: { controller: "driving-record-form" }) do |f| %>
+          <% if @driving_record.errors.any? %>
+            <div class="alert alert-error">
+              <div>
+                <span class="font-bold"><%= pluralize(@driving_record.errors.count, "個") %>のエラーがあります：</span>
+                <ul class="list-disc list-inside mt-2">
+                  <% @driving_record.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- 出発情報 -->
+          <div class="divider">出発情報</div>
+
+          <div class="form-control">
+            <%= f.label :departure_datetime, "出発日時", class: "label" %>
+            <%= f.datetime_local_field :departure_datetime, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :store_id, "店舗名（必須）", class: "label" %>
+            <%= f.collection_select :store_id,
+                Store.all, :id, :name,
+                { prompt: "店舗を選択してください" },
+                {
+                  class: "select select-bordered w-full",
+                  data: {
+                    driving_record_form_target: "storeSelect",
+                    action: "change->driving-record-form#updateDepartureLocation"
+                  }
+                } do |store| %>
+              <option value="<%= store.id %>" data-address="<%= store.address %>"><%= store.name %></option>
+            <% end %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :departure_location, "出発地点", class: "label" %>
+            <div class="join w-full">
+              <%= f.text_field :departure_location,
+                  class: "input input-bordered join-item flex-1",
+                  placeholder: "例：福岡県福岡市中央区天神2-1-1",
+                  data: { driving_record_form_target: "departureLocation" } %>
+              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="departure">
+                📍 現在地
+              </button>
+            </div>
+            <%= f.hidden_field :departure_latitude %>
+            <%= f.hidden_field :departure_longitude %>
+            <label class="label">
+              <span class="label-text-alt">店舗を選択すると自動入力されます</span>
+            </label>
+          </div>
+
+          <!-- 経由地 -->
+          <div class="divider">経由地（任意）</div>
+
+          <div class="form-control">
+            <%= f.label :waypoint_location, "経由地", class: "label" %>
+            <div class="join w-full">
+              <%= f.text_field :waypoint_location,
+                  class: "input input-bordered join-item flex-1",
+                  placeholder: "例：福岡県福岡市博多区中洲4-5-6" %>
+              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="waypoint">
+                📍 現在地
+              </button>
+            </div>
+            <%= f.hidden_field :waypoint_latitude %>
+            <%= f.hidden_field :waypoint_longitude %>
+          </div>
+
+          <!-- 到着情報 -->
+          <div class="divider">到着情報</div>
+
+          <div class="form-control">
+            <%= f.label :arrival_datetime, "到着日時（必須）", class: "label" %>
+            <%= f.datetime_local_field :arrival_datetime, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :destination, "目的地（必須）", class: "label" %>
+            <div class="join w-full">
+              <%= f.text_field :destination,
+                  class: "input input-bordered join-item flex-1",
+                  placeholder: "例：福岡県福岡市早良区西新3-4-5",
+                  data: { driving_record_form_target: "destination" } %>
+              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="destination">
+                📍 現在地
+              </button>
+            </div>
+            <%= f.hidden_field :destination_latitude %>
+            <%= f.hidden_field :destination_longitude %>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :customer_id, "顧客", class: "label" %>
+            <%= f.collection_select :customer_id,
+                Customer.all, :id, :name,
+                { prompt: "顧客を選択（任意）" },
+                {
+                  class: "select select-bordered w-full",
+                  data: {
+                    driving_record_form_target: "customerSelect",
+                    action: "change->driving-record-form#updateDestination"
+                  }
+                } do |customer| %>
+              <option value="<%= customer.id %>" data-address="<%= customer.address %>"><%= customer.name %></option>
+            <% end %>
+            <label class="label">
+              <span class="label-text-alt">登録済みの顧客から選択できます</span>
+            </label>
+          </div>
+
+          <!-- 運転情報 -->
+          <div class="divider">運転情報</div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <%= f.label :distance, "走行距離（km）（必須）", class: "label" %>
+              <%= f.number_field :distance, step: 0.1, class: "input input-bordered w-full", placeholder: "10.5" %>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :amount, "金額（円）（必須）", class: "label" %>
+              <%= f.number_field :amount, class: "input input-bordered w-full", placeholder: "3000" %>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <%= f.label :vehicle_id, "車両番号（必須）", class: "label" %>
+            <%= f.collection_select :vehicle_id, Vehicle.all, :id, :vehicle_number, { prompt: "車両を選択してください" }, class: "select select-bordered w-full" %>
+          </div>
+
+          <!-- 備考 -->
+          <div class="divider">備考</div>
+
+          <div class="form-control">
+            <%= f.label :notes, "備考", class: "label" %>
+            <%= f.text_area :notes, rows: 3, class: "textarea textarea-bordered w-full", placeholder: "引き継ぎ事項など" %>
+          </div>
+
+          <!-- アクション -->
+          <div class="card-actions justify-end mt-6">
+            <%= link_to "キャンセル", driving_records_path, class: "btn btn-ghost" %>
+            <%= f.submit "登録する", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

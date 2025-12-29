@@ -8646,6 +8646,73 @@
   var application = Application.start();
   application.debug = false;
   window.Stimulus = application;
+
+  // app/javascript/controllers/driving_record_form_controller.js
+  var driving_record_form_controller_default = class extends Controller {
+    static targets = ["storeSelect", "departureLocation", "customerSelect", "destination"];
+    connect() {
+      console.log("Driving record form controller connected");
+    }
+    // 店舗選択時に出発地点を自動入力
+    updateDepartureLocation() {
+      const selectedOption = this.storeSelectTarget.selectedOptions[0];
+      if (selectedOption && selectedOption.dataset.address) {
+        this.departureLocationTarget.value = selectedOption.dataset.address;
+      }
+    }
+    // 顧客選択時に目的地を自動入力
+    updateDestination() {
+      const selectedOption = this.customerSelectTarget.selectedOptions[0];
+      if (selectedOption && selectedOption.dataset.address) {
+        this.destinationTarget.value = selectedOption.dataset.address;
+      }
+    }
+    // 現在地取得（HTML5 Geolocation API）
+    getCurrentLocation(event) {
+      event.preventDefault();
+      const target = event.target.dataset.target;
+      if (!navigator.geolocation) {
+        alert("\u304A\u4F7F\u3044\u306E\u30D6\u30E9\u30A6\u30B6\u306F\u4F4D\u7F6E\u60C5\u5831\u306B\u5BFE\u5FDC\u3057\u3066\u3044\u307E\u305B\u3093");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          if (target === "departure") {
+            document.querySelector('[name="driving_record[departure_latitude]"]').value = lat;
+            document.querySelector('[name="driving_record[departure_longitude]"]').value = lng;
+          } else if (target === "waypoint") {
+            document.querySelector('[name="driving_record[waypoint_latitude]"]').value = lat;
+            document.querySelector('[name="driving_record[waypoint_longitude]"]').value = lng;
+          } else if (target === "destination") {
+            document.querySelector('[name="driving_record[destination_latitude]"]').value = lat;
+            document.querySelector('[name="driving_record[destination_longitude]"]').value = lng;
+          }
+          alert(`\u4F4D\u7F6E\u60C5\u5831\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
+        },
+        (error2) => {
+          alert("\u4F4D\u7F6E\u60C5\u5831\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F: " + error2.message);
+        }
+      );
+    }
+  };
+
+  // app/javascript/controllers/flash_controller.js
+  var flash_controller_default = class extends Controller {
+    static values = {
+      duration: { type: Number, default: 3e3 }
+    };
+    connect() {
+      setTimeout(() => {
+        this.element.remove();
+      }, this.durationValue);
+    }
+  };
+
+  // app/javascript/controllers/index.js
+  application.register("driving-record-form", driving_record_form_controller_default);
+  application.register("flash", flash_controller_default);
 })();
 /*! Bundled license information:
 
