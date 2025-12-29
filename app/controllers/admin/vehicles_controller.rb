@@ -1,7 +1,5 @@
 module Admin
-  class VehiclesController < ApplicationController
-    before_action :authenticate_driver!
-    before_action :authorize_admin!
+  class VehiclesController < BaseController
     before_action :set_vehicle, only: [ :show, :edit, :update, :destroy ]
 
     def index
@@ -61,12 +59,6 @@ module Admin
 
     def vehicle_params
       params.require(:vehicle).permit(:vehicle_number, :vehicle_info)
-    end
-
-    def authorize_admin!
-      unless current_driver.admin?
-        redirect_to root_path, alert: "管理者権限が必要です。"
-      end
     end
   end
 end
