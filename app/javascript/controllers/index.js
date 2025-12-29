@@ -3,5 +3,9 @@
 
 import { application } from "./application"
 
-// Configure your import map in importmap.rb or use a bundler
-// For now, controllers will be loaded manually as needed
+// Import and register controllers
+import DrivingRecordFormController from "./driving_record_form_controller"
+import FlashController from "./flash_controller"
+
+application.register("driving-record-form", DrivingRecordFormController)
+application.register("flash", FlashController)
