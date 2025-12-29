@@ -1,0 +1,34 @@
+<div class="min-h-screen bg-base-200">
+  <%= render "shared/navbar" %>
+
+  <div class="container mx-auto p-4">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">車両管理</h1>
+      <%= link_to "新規登録", new_admin_vehicle_path, class: "btn btn-primary" %>
+    </div>
+
+    <% if @vehicles.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% @vehicles.each do |vehicle| %>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title"><%= vehicle.vehicle_number %></h2>
+              <p class="text-gray-600"><%= vehicle.vehicle_info %></p>
+
+              <div class="card-actions justify-end mt-4">
+                <%= link_to "編集", edit_admin_vehicle_path(vehicle), class: "btn btn-sm btn-warning" %>
+                <%= button_to "削除", admin_vehicle_path(vehicle), method: :delete,
+                    data: { turbo_confirm: "本当に削除しますか？この車両に紐づく運転記録がある場合は削除できません。" },
+                    class: "btn btn-sm btn-error" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        <span>車両が登録されていません。</span>
+      </div>
+    <% end %>
+  </div>
+</div>
