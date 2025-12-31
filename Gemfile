@@ -39,7 +39,7 @@ gem "bootsnap", require: false
 gem "devise", "~> 4.9"
 
 # Tailwind CSS + daisyUI
-gem "tailwindcss-rails", "~> 3.0"
+gem "tailwindcss-rails", "~> 4.4"
 
 # Error monitoring
 gem "sentry-ruby"
