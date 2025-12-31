@@ -8,41 +8,47 @@
     </div>
 
     <% if @customers.any? %>
-      <div class="overflow-x-auto">
-        <table class="table table-zebra w-full">
-          <thead>
-            <tr>
-              <th>顧客名</th>
-              <th>住所</th>
-              <th>電話番号</th>
-              <th>備考</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @customers.each do |customer| %>
-              <tr>
-                <td><%= customer.name %></td>
-                <td>
-                  <%= customer.address %>
-                  <% if customer.latitude && customer.longitude %>
-                    <br>
-                    <%= link_to "📍 地図", "https://www.google.com/maps?q=#{customer.latitude},#{customer.longitude}",
-                        target: "_blank", class: "link link-primary text-xs" %>
-                  <% end %>
-                </td>
-                <td><%= customer.phone %></td>
-                <td><%= truncate(customer.notes, length: 30) %></td>
-                <td>
-                  <%= link_to "編集", edit_admin_customer_path(customer), class: "btn btn-sm btn-warning" %>
-                  <%= button_to "削除", admin_customer_path(customer), method: :delete,
-                      data: { turbo_confirm: "本当に削除しますか？" },
-                      class: "btn btn-sm btn-error" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body p-0">
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead class="bg-base-200">
+                <tr>
+                  <th>顧客名</th>
+                  <th>住所</th>
+                  <th>電話番号</th>
+                  <th>備考</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @customers.each do |customer| %>
+                  <tr>
+                    <td><%= customer.name %></td>
+                    <td>
+                      <%= customer.address %>
+                      <% if customer.latitude && customer.longitude %>
+                        <br>
+                        <%= link_to "📍 地図", "https://www.google.com/maps?q=#{customer.latitude},#{customer.longitude}",
+                            target: "_blank", class: "link link-primary text-xs" %>
+                      <% end %>
+                    </td>
+                    <td><%= customer.phone %></td>
+                    <td><%= truncate(customer.notes, length: 30) %></td>
+                    <td>
+                      <div class="flex gap-2">
+                        <%= link_to "編集", edit_admin_customer_path(customer), class: "btn btn-sm btn-warning" %>
+                        <%= button_to "削除", admin_customer_path(customer), method: :delete,
+                            data: { turbo_confirm: "本当に削除しますか？" },
+                            class: "btn btn-sm btn-error" %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     <% else %>
       <div class="alert alert-info">
