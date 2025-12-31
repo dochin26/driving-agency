@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: driving_agency_development
+      POSTGRES_DB: app_development
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -32,7 +32,6 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/driving_agency_development
       RAILS_ENV: development
       RAILS_LOG_TO_STDOUT: "true"
       # Google Maps API（開発時はダミーでOK）
