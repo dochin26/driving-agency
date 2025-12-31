@@ -32,12 +32,13 @@ RUN yarn install
 # アプリケーションのコードをコピー
 COPY . .
 
-# アセットのプリコンパイル（本番環境用）
-# 開発環境では不要だがDockerイメージに含めておく
-# RUN bundle exec rails assets:precompile
-
 # ポート3000を公開
 EXPOSE 3000
+
+# エントリポイントスクリプトをコピー
+COPY bin/docker-entrypoint /usr/bin/
+RUN chmod +x /usr/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
 
 # サーバーを起動
 CMD ["rails", "server", "-b", "0.0.0.0"]
