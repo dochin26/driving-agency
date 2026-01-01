@@ -37,7 +37,7 @@
                     <td><%= driver.sign_in_count %></td>
                     <td>
                       <% if driver.last_sign_in_at %>
-                        <%= t(driver.last_sign_in_at, format: :short) %>
+                        <%= driver.last_sign_in_at.strftime("%Y/%m/%d %H:%M") %>
                       <% else %>
                         <span class="text-gray-400">未ログイン</span>
                       <% end %>
