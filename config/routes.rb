@@ -29,6 +29,11 @@ Rails.application.routes.draw do
     resources :daily_report_settings, only: [ :index, :edit, :update ]
   end
 
+  # API routes
+  namespace :api do
+    post "geocoding/reverse_geocode", to: "geocoding#reverse_geocode"
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

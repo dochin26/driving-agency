@@ -22,39 +22,4 @@ export default class extends Controller {
       this.destinationTarget.value = selectedOption.dataset.address
     }
   }
-
-  // 現在地取得（HTML5 Geolocation API）
-  getCurrentLocation(event) {
-    event.preventDefault()
-    const target = event.target.dataset.target
-
-    if (!navigator.geolocation) {
-      alert("お使いのブラウザは位置情報に対応していません")
-      return
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude
-        const lng = position.coords.longitude
-
-        // 緯度経度をフォームに設定
-        if (target === "departure") {
-          document.querySelector('[name="driving_record[departure_latitude]"]').value = lat
-          document.querySelector('[name="driving_record[departure_longitude]"]').value = lng
-        } else if (target === "waypoint") {
-          document.querySelector('[name="driving_record[waypoint_latitude]"]').value = lat
-          document.querySelector('[name="driving_record[waypoint_longitude]"]').value = lng
-        } else if (target === "destination") {
-          document.querySelector('[name="driving_record[destination_latitude]"]').value = lat
-          document.querySelector('[name="driving_record[destination_longitude]"]').value = lng
-        }
-
-        alert(`位置情報を取得しました (${lat.toFixed(6)}, ${lng.toFixed(6)})`)
-      },
-      (error) => {
-        alert("位置情報の取得に失敗しました: " + error.message)
-      }
-    )
-  }
 }

@@ -6,6 +6,8 @@ import { application } from "./application"
 // Import and register controllers
 import DrivingRecordFormController from "./driving_record_form_controller"
 import FlashController from "./flash_controller"
+import GeolocationController from "./geolocation_controller"
 
 application.register("driving-record-form", DrivingRecordFormController)
 application.register("flash", FlashController)
+application.register("geolocation", GeolocationController)
