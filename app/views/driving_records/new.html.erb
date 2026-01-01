@@ -54,19 +54,25 @@
             <% end %>
           </div>
 
-          <div class="form-control">
+          <div class="form-control" data-controller="geolocation">
             <%= f.label :departure_location, "出発地点", class: "label" %>
             <div class="join w-full">
               <%= f.text_field :departure_location,
                   class: "input input-bordered join-item flex-1",
                   placeholder: "例：福岡県福岡市中央区天神2-1-1",
-                  data: { driving_record_form_target: "departureLocation" } %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="departure">
+                  data: {
+                    driving_record_form_target: "departureLocation",
+                    geolocation_target: "addressField"
+                  } %>
+              <button type="button"
+                      class="btn btn-secondary join-item"
+                      data-geolocation-target="button"
+                      data-action="click->geolocation#getCurrentLocation">
                 📍 現在地
               </button>
             </div>
-            <%= f.hidden_field :departure_latitude %>
-            <%= f.hidden_field :departure_longitude %>
+            <%= f.hidden_field :departure_latitude, data: { geolocation_target: "latitudeField" } %>
+            <%= f.hidden_field :departure_longitude, data: { geolocation_target: "longitudeField" } %>
             <label class="label">
               <span class="label-text-alt">店舗を選択すると自動入力されます</span>
             </label>
@@ -75,18 +81,22 @@
           <!-- 経由地 -->
           <div class="divider">経由地（任意）</div>
 
-          <div class="form-control">
+          <div class="form-control" data-controller="geolocation">
             <%= f.label :waypoint_location, "経由地", class: "label" %>
             <div class="join w-full">
               <%= f.text_field :waypoint_location,
                   class: "input input-bordered join-item flex-1",
-                  placeholder: "例：福岡県福岡市博多区中洲4-5-6" %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="waypoint">
+                  placeholder: "例：福岡県福岡市博多区中洲4-5-6",
+                  data: { geolocation_target: "addressField" } %>
+              <button type="button"
+                      class="btn btn-secondary join-item"
+                      data-geolocation-target="button"
+                      data-action="click->geolocation#getCurrentLocation">
                 📍 現在地
               </button>
             </div>
-            <%= f.hidden_field :waypoint_latitude %>
-            <%= f.hidden_field :waypoint_longitude %>
+            <%= f.hidden_field :waypoint_latitude, data: { geolocation_target: "latitudeField" } %>
+            <%= f.hidden_field :waypoint_longitude, data: { geolocation_target: "longitudeField" } %>
           </div>
 
           <!-- 到着情報 -->
@@ -97,19 +107,25 @@
             <%= f.datetime_local_field :arrival_datetime, class: "input input-bordered w-full" %>
           </div>
 
-          <div class="form-control">
+          <div class="form-control" data-controller="geolocation">
             <%= f.label :destination, "目的地（必須）", class: "label" %>
             <div class="join w-full">
               <%= f.text_field :destination,
                   class: "input input-bordered join-item flex-1",
                   placeholder: "例：福岡県福岡市早良区西新3-4-5",
-                  data: { driving_record_form_target: "destination" } %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="destination">
+                  data: {
+                    driving_record_form_target: "destination",
+                    geolocation_target: "addressField"
+                  } %>
+              <button type="button"
+                      class="btn btn-secondary join-item"
+                      data-geolocation-target="button"
+                      data-action="click->geolocation#getCurrentLocation">
                 📍 現在地
               </button>
             </div>
-            <%= f.hidden_field :destination_latitude %>
-            <%= f.hidden_field :destination_longitude %>
+            <%= f.hidden_field :destination_latitude, data: { geolocation_target: "latitudeField" } %>
+            <%= f.hidden_field :destination_longitude, data: { geolocation_target: "longitudeField" } %>
           </div>
 
           <div class="form-control">

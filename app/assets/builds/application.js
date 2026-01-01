@@ -6778,13 +6778,13 @@
     }
   };
   function add(map, key, value) {
-    fetch(map, key).add(value);
+    fetch2(map, key).add(value);
   }
   function del(map, key, value) {
-    fetch(map, key).delete(value);
+    fetch2(map, key).delete(value);
     prune(map, key);
   }
-  function fetch(map, key) {
+  function fetch2(map, key) {
     let values = map.get(key);
     if (!values) {
       values = /* @__PURE__ */ new Set();
@@ -8667,35 +8667,6 @@
         this.destinationTarget.value = selectedOption.dataset.address;
       }
     }
-    // 現在地取得（HTML5 Geolocation API）
-    getCurrentLocation(event) {
-      event.preventDefault();
-      const target = event.target.dataset.target;
-      if (!navigator.geolocation) {
-        alert("\u304A\u4F7F\u3044\u306E\u30D6\u30E9\u30A6\u30B6\u306F\u4F4D\u7F6E\u60C5\u5831\u306B\u5BFE\u5FDC\u3057\u3066\u3044\u307E\u305B\u3093");
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          if (target === "departure") {
-            document.querySelector('[name="driving_record[departure_latitude]"]').value = lat;
-            document.querySelector('[name="driving_record[departure_longitude]"]').value = lng;
-          } else if (target === "waypoint") {
-            document.querySelector('[name="driving_record[waypoint_latitude]"]').value = lat;
-            document.querySelector('[name="driving_record[waypoint_longitude]"]').value = lng;
-          } else if (target === "destination") {
-            document.querySelector('[name="driving_record[destination_latitude]"]').value = lat;
-            document.querySelector('[name="driving_record[destination_longitude]"]').value = lng;
-          }
-          alert(`\u4F4D\u7F6E\u60C5\u5831\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
-        },
-        (error2) => {
-          alert("\u4F4D\u7F6E\u60C5\u5831\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F: " + error2.message);
-        }
-      );
-    }
   };
 
   // app/javascript/controllers/flash_controller.js
@@ -8710,9 +8681,112 @@
     }
   };
 
+  // app/javascript/controllers/geolocation_controller.js
+  var geolocation_controller_default = class extends Controller {
+    static targets = ["addressField", "latitudeField", "longitudeField", "button"];
+    connect() {
+      if (!navigator.geolocation) {
+        this.disableButton("\u4F4D\u7F6E\u60C5\u5831\u304C\u5229\u7528\u3067\u304D\u307E\u305B\u3093");
+      }
+    }
+    getCurrentLocation(event) {
+      event.preventDefault();
+      const button = this.buttonTarget;
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = "\u53D6\u5F97\u4E2D...";
+      navigator.geolocation.getCurrentPosition(
+        (position) => this.handleSuccess(position, button, originalText),
+        (error2) => this.handleError(error2, button, originalText),
+        {
+          enableHighAccuracy: true,
+          timeout: 1e4,
+          maximumAge: 0
+        }
+      );
+    }
+    async handleSuccess(position, button, originalText) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      if (this.hasLatitudeFieldTarget) {
+        this.latitudeFieldTarget.value = latitude;
+      }
+      if (this.hasLongitudeFieldTarget) {
+        this.longitudeFieldTarget.value = longitude;
+      }
+      try {
+        const address = await this.reverseGeocode(latitude, longitude);
+        if (address && this.hasAddressFieldTarget) {
+          this.addressFieldTarget.value = address;
+        }
+        button.disabled = false;
+        button.textContent = originalText;
+        this.showFeedback(button, "success");
+      } catch (error2) {
+        console.error("\u4F4F\u6240\u5909\u63DB\u30A8\u30E9\u30FC:", error2);
+        button.disabled = false;
+        button.textContent = originalText;
+        if (this.hasAddressFieldTarget) {
+          this.addressFieldTarget.value = `${latitude}, ${longitude}`;
+        }
+        alert("\u4F4F\u6240\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u5EA7\u6A19\u3092\u8A2D\u5B9A\u3057\u307E\u3057\u305F\u3002");
+      }
+    }
+    handleError(error2, button, originalText) {
+      button.disabled = false;
+      button.textContent = originalText;
+      let message = "\u4F4D\u7F6E\u60C5\u5831\u306E\u53D6\u5F97\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002";
+      switch (error2.code) {
+        case error2.PERMISSION_DENIED:
+          message = "\u4F4D\u7F6E\u60C5\u5831\u306E\u4F7F\u7528\u304C\u8A31\u53EF\u3055\u308C\u3066\u3044\u307E\u305B\u3093\u3002\u30D6\u30E9\u30A6\u30B6\u306E\u8A2D\u5B9A\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002";
+          break;
+        case error2.POSITION_UNAVAILABLE:
+          message = "\u4F4D\u7F6E\u60C5\u5831\u304C\u5229\u7528\u3067\u304D\u307E\u305B\u3093\u3002";
+          break;
+        case error2.TIMEOUT:
+          message = "\u4F4D\u7F6E\u60C5\u5831\u306E\u53D6\u5F97\u304C\u30BF\u30A4\u30E0\u30A2\u30A6\u30C8\u3057\u307E\u3057\u305F\u3002";
+          break;
+      }
+      alert(message);
+    }
+    async reverseGeocode(latitude, longitude) {
+      const csrfToken = document.querySelector("[name='csrf-token']").content;
+      const response = await fetch("/api/geocoding/reverse_geocode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken
+        },
+        body: JSON.stringify({ latitude, longitude })
+      });
+      if (!response.ok) {
+        throw new Error("Geocoding request failed");
+      }
+      const data = await response.json();
+      return data.address;
+    }
+    showFeedback(button, type) {
+      const originalClass = button.className;
+      if (type === "success") {
+        button.classList.remove("btn-primary");
+        button.classList.add("btn-success");
+        setTimeout(() => {
+          button.className = originalClass;
+        }, 1e3);
+      }
+    }
+    disableButton(message) {
+      if (this.hasButtonTarget) {
+        this.buttonTarget.disabled = true;
+        this.buttonTarget.textContent = message;
+      }
+    }
+  };
+
   // app/javascript/controllers/index.js
   application.register("driving-record-form", driving_record_form_controller_default);
   application.register("flash", flash_controller_default);
+  application.register("geolocation", geolocation_controller_default);
 })();
 /*! Bundled license information:
 
