@@ -1,20 +1,76 @@
 class DrivingRecord < ApplicationRecord
+  # Enums
+  enum :status, { draft: 0, completed: 1 }, default: :draft
+
   # Associations
   belongs_to :driver
   belongs_to :vehicle
-  belongs_to :store
+  belongs_to :store, optional: true
   belongs_to :customer, optional: true
+  has_many :waypoints, -> { order(:sequence) }, dependent: :destroy
+
+  # Nested attributes for waypoints
+  accepts_nested_attributes_for :waypoints, allow_destroy: true, reject_if: :all_blank
 
   # Validations
   validates :departure_datetime, presence: true
-  validates :arrival_datetime, presence: true
-  validates :destination, presence: true
-  validates :distance, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0, only_integer: true }
+  validates :destination, presence: true, if: :completed?
+  validates :arrival_datetime, presence: true, if: :completed?
+  validates :distance, presence: true, numericality: { greater_than_or_equal_to: 0 }, if: :completed?
+  validates :vehicle_id, presence: true, if: :completed?
+  validates :waypoints, length: { maximum: 10 }
+
+  # 店舗名または店舗IDのいずれかが必須
+  validate :store_name_or_store_id_present, if: :completed?
+
+  # 金額のバリデーション
+  validates :fare_amount, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
+  validates :highway_fee, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
+  validates :parking_fee, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
+  validates :other_fee, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
+
+  # Callbacks
+  before_save :calculate_total_amount
+  before_save :set_completed_at, if: :will_save_change_to_status?
 
   # Scopes
   scope :by_date, ->(date) { where("departure_datetime >= ? AND departure_datetime < ?", date.beginning_of_day, date.end_of_day) }
   scope :by_vehicle, ->(vehicle_id) { where(vehicle_id: vehicle_id) }
   scope :by_driver, ->(driver_id) { where(driver_id: driver_id) }
   scope :recent, -> { order(departure_datetime: :desc) }
+  scope :drafts, -> { where(status: :draft) }
+  scope :completed_records, -> { where(status: :completed) }
+
+  # 合計金額を計算
+  def total_amount
+    (fare_amount || 0) + (highway_fee || 0) + (parking_fee || 0) + (other_fee || 0)
+  end
+
+  # 店舗名を取得（店舗IDがあればその名前、なければ手入力の店舗名）
+  def store_display_name
+    store&.name || attributes["store_name"]
+  end
+
+  # 顧客名を取得（顧客IDがあればその名前、なければ手入力の顧客名）
+  def customer_display_name
+    customer&.name || customer_name
+  end
+
+  private
+
+  def calculate_total_amount
+    self.amount = total_amount
+  end
+
+  def set_completed_at
+    if status == "completed" && completed_at.nil?
+      self.completed_at = Time.current
+    end
+  end
+
+  def store_name_or_store_id_present
+    if store_id.blank? && attributes["store_name"].blank?
+      errors.add(:base, "店舗名または店舗を選択してください")
+    end
+  end
 end
