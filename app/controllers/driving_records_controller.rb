@@ -100,18 +100,22 @@ class DrivingRecordsController < ApplicationController
       :departure_latitude,
       :departure_longitude,
       :store_id,
-      :waypoint_location,
-      :waypoint_latitude,
-      :waypoint_longitude,
+      :store_name,
       :arrival_datetime,
       :destination,
       :destination_latitude,
       :destination_longitude,
       :distance,
-      :amount,
+      :fare_amount,
+      :highway_fee,
+      :parking_fee,
+      :other_fee,
       :vehicle_id,
       :customer_id,
-      :notes
+      :customer_name,
+      :notes,
+      :status,
+      waypoints_attributes: [ :id, :sequence, :location, :latitude, :longitude, :_destroy ]
     )
   end
 end

@@ -8783,10 +8783,64 @@
     }
   };
 
+  // app/javascript/controllers/waypoints_controller.js
+  var waypoints_controller_default = class extends Controller {
+    static targets = ["container", "template"];
+    static values = {
+      count: { type: Number, default: 0 },
+      maxWaypoints: { type: Number, default: 10 }
+    };
+    connect() {
+      if (this.countValue === 0) {
+        this.addWaypoint();
+      }
+    }
+    addWaypoint(event) {
+      if (event) event.preventDefault();
+      if (this.countValue >= this.maxWaypointsValue) {
+        alert(`\u7D4C\u7531\u5730\u306F\u6700\u5927${this.maxWaypointsValue}\u7B87\u6240\u307E\u3067\u3067\u3059`);
+        return;
+      }
+      const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, (/* @__PURE__ */ new Date()).getTime()).replace(/SEQUENCE/g, this.countValue + 1);
+      this.containerTarget.insertAdjacentHTML("beforeend", content);
+      this.countValue++;
+    }
+    removeWaypoint(event) {
+      event.preventDefault();
+      const item = event.target.closest("[data-waypoint-item]");
+      if (item) {
+        const destroyInput = item.querySelector('input[name*="_destroy"]');
+        if (destroyInput) {
+          destroyInput.value = "1";
+          item.style.display = "none";
+        } else {
+          item.remove();
+        }
+        this.countValue--;
+        this.reorderSequences();
+      }
+    }
+    // 経由地の順序を再設定
+    reorderSequences() {
+      const items = this.containerTarget.querySelectorAll('[data-waypoint-item]:not([style*="display: none"])');
+      items.forEach((item, index) => {
+        const sequenceInput = item.querySelector('input[name*="[sequence]"]');
+        const label = item.querySelector("label");
+        if (sequenceInput) {
+          sequenceInput.value = index + 1;
+        }
+        if (label) {
+          label.textContent = `\u7D4C\u7531\u5730${index + 1}`;
+        }
+      });
+    }
+  };
+
   // app/javascript/controllers/index.js
   application.register("driving-record-form", driving_record_form_controller_default);
   application.register("flash", flash_controller_default);
   application.register("geolocation", geolocation_controller_default);
+  application.register("waypoints", waypoints_controller_default);
 })();
 /*! Bundled license information:
 
