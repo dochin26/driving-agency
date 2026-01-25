@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_29_011824) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,28 +51,34 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_011824) do
 
   create_table "driving_records", force: :cascade do |t|
     t.integer "amount", null: false
-    t.datetime "arrival_datetime", null: false
+    t.datetime "arrival_datetime"
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.bigint "customer_id"
+    t.string "customer_name"
     t.datetime "departure_datetime", null: false
     t.decimal "departure_latitude", precision: 10, scale: 7
     t.string "departure_location"
     t.decimal "departure_longitude", precision: 10, scale: 7
-    t.string "destination", null: false
+    t.string "destination"
     t.decimal "destination_latitude", precision: 10, scale: 7
     t.decimal "destination_longitude", precision: 10, scale: 7
-    t.decimal "distance", precision: 8, scale: 2, null: false
+    t.decimal "distance", precision: 8, scale: 2
     t.bigint "driver_id", null: false
+    t.integer "fare_amount", default: 0
+    t.integer "highway_fee", default: 0
     t.text "notes"
-    t.bigint "store_id", null: false
+    t.integer "other_fee", default: 0
+    t.integer "parking_fee", default: 0
+    t.integer "status", default: 0, null: false
+    t.bigint "store_id"
+    t.string "store_name"
     t.datetime "updated_at", null: false
-    t.bigint "vehicle_id", null: false
-    t.decimal "waypoint_latitude", precision: 10, scale: 7
-    t.string "waypoint_location"
-    t.decimal "waypoint_longitude", precision: 10, scale: 7
+    t.bigint "vehicle_id"
     t.index ["customer_id"], name: "index_driving_records_on_customer_id"
     t.index ["departure_datetime"], name: "index_driving_records_on_departure_datetime"
     t.index ["driver_id"], name: "index_driving_records_on_driver_id"
+    t.index ["status"], name: "index_driving_records_on_status"
     t.index ["store_id"], name: "index_driving_records_on_store_id"
     t.index ["vehicle_id"], name: "index_driving_records_on_vehicle_id"
   end
@@ -95,8 +101,21 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_011824) do
     t.index ["vehicle_number"], name: "index_vehicles_on_vehicle_number", unique: true
   end
 
+  create_table "waypoints", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "driving_record_id", null: false
+    t.decimal "latitude", precision: 10, scale: 6
+    t.string "location", null: false
+    t.decimal "longitude", precision: 10, scale: 6
+    t.integer "sequence", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driving_record_id", "sequence"], name: "index_waypoints_on_driving_record_id_and_sequence"
+    t.index ["driving_record_id"], name: "index_waypoints_on_driving_record_id"
+  end
+
   add_foreign_key "driving_records", "customers"
   add_foreign_key "driving_records", "drivers"
   add_foreign_key "driving_records", "stores"
   add_foreign_key "driving_records", "vehicles"
+  add_foreign_key "waypoints", "driving_records"
 end

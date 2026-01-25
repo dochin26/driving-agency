@@ -20,21 +20,29 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="bg-base-100">
-    <div id="flash-messages" class="toast toast-top toast-end z-50">
-      <% if notice %>
-        <div class="alert alert-success shadow-lg" data-controller="flash" data-flash-duration-value="3000">
-          <span><%= notice %></span>
-        </div>
-      <% end %>
+  <body class="bg-base-200">
+    <!-- サイドバー（PC/タブレット） -->
+    <% if driver_signed_in? %>
+      <%= render "shared/sidebar" %>
+    <% end %>
 
-      <% if alert %>
-        <div class="alert alert-error shadow-lg" data-controller="flash" data-flash-duration-value="3000">
-          <span><%= alert %></span>
-        </div>
-      <% end %>
+    <!-- メインコンテンツエリア -->
+    <div class="<%= driver_signed_in? ? 'md:pl-64 lg:pl-72' : '' %>">
+      <div id="flash-messages" class="toast toast-top toast-end z-50">
+        <% if notice %>
+          <div class="alert alert-success shadow-lg" data-controller="flash" data-flash-duration-value="3000">
+            <span><%= notice %></span>
+          </div>
+        <% end %>
+
+        <% if alert %>
+          <div class="alert alert-error shadow-lg" data-controller="flash" data-flash-duration-value="3000">
+            <span><%= alert %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <%= yield %>
     </div>
-
-    <%= yield %>
   </body>
 </html>

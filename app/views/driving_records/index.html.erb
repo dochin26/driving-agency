@@ -1,15 +1,69 @@
-<div class="min-h-screen bg-base-200">
+<div class="min-h-screen bg-base-200 pb-20 md:pb-0">
   <%= render "shared/navbar" %>
 
-  <div class="container mx-auto p-4">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">運転記録一覧</h1>
-      <%= link_to "新規登録", new_driving_record_path, class: "btn btn-primary" %>
-    </div>
+  <!-- FAB（新規登録ボタン）スマホのみ -->
+  <%= link_to new_driving_record_path, class: "btn btn-primary btn-circle btn-lg fixed bottom-20 right-4 md:hidden shadow-xl z-30" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+  <% end %>
 
-    <% if @driving_records.any? %>
-      <div class="overflow-x-auto">
-        <table class="table table-zebra w-full">
+  <div class="p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold">運転記録一覧</h1>
+        <%= link_to new_driving_record_path, class: "btn btn-primary hidden md:inline-flex" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          新規登録
+        <% end %>
+      </div>
+
+      <% if @driving_records.any? %>
+        <!-- スマホ：カード表示 -->
+        <div class="space-y-3 md:hidden">
+          <% @driving_records.each do |record| %>
+            <div class="card bg-base-100 shadow-md">
+              <div class="card-body p-4">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="text-sm text-base-content/60">
+                    <%= record.departure_datetime&.strftime("%m/%d %H:%M") || "-" %>
+                  </div>
+                  <% if record.draft? %>
+                    <span class="badge badge-warning badge-sm">下書き</span>
+                  <% end %>
+                </div>
+                <div class="flex items-center gap-2 text-sm mb-2">
+                  <span class="truncate flex-1"><%= record.store_display_name || "-" %></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span class="truncate flex-1"><%= record.destination || "-" %></span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <div class="text-xs text-base-content/60">
+                    <%= record.vehicle&.vehicle_number || "-" %> / <%= record.driver.name %>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-primary">¥<%= number_with_delimiter(record.amount || 0) %></span>
+                    <%= link_to driving_record_path(record), class: "btn btn-sm btn-ghost btn-circle" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- PC：テーブル表示 -->
+        <div class="card bg-base-100 shadow-xl hidden md:block">
+          <div class="card-body p-0">
+            <div class="overflow-x-auto">
+              <table class="table table-zebra w-full">
           <thead>
             <tr>
               <th>出発日時</th>
@@ -25,29 +79,43 @@
           <tbody>
             <% @driving_records.each do |record| %>
               <tr>
-                <td><%= record.departure_datetime.strftime("%Y/%m/%d %H:%M") %></td>
-                <td><%= record.store.name %></td>
-                <td><%= record.destination %></td>
-                <td><%= record.distance %>km</td>
-                <td>¥<%= number_with_delimiter(record.amount) %></td>
-                <td><%= record.vehicle.vehicle_number %></td>
+                <td>
+                  <%= record.departure_datetime&.strftime("%Y/%m/%d %H:%M") || "-" %>
+                  <% if record.draft? %>
+                    <span class="badge badge-warning badge-sm ml-2">下書き</span>
+                  <% end %>
+                </td>
+                <td><%= record.store_display_name || "-" %></td>
+                <td><%= record.destination || "-" %></td>
+                <td><%= record.distance ? "#{record.distance}km" : "-" %></td>
+                <td>¥<%= number_with_delimiter(record.amount || 0) %></td>
+                <td><%= record.vehicle&.vehicle_number || "-" %></td>
                 <td><%= record.driver.name %></td>
                 <td>
                   <%= link_to "詳細", driving_record_path(record), class: "btn btn-sm btn-info" %>
                 </td>
               </tr>
             <% end %>
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div class="mt-4">
+      <div class="mt-6">
         <%= paginate @driving_records %>
       </div>
     <% else %>
-      <div class="alert alert-info">
-        <span>運転記録がありません。</span>
+      <div class="card bg-base-100 shadow-md">
+        <div class="card-body text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-base-content/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-base-content/60">運転記録がありません</p>
+          <p class="text-base-content/40 text-sm mt-1">右下のボタンから登録できます</p>
+        </div>
       </div>
     <% end %>
+    </div>
   </div>
 </div>

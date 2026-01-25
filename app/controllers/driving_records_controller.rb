@@ -22,12 +22,23 @@ class DrivingRecordsController < ApplicationController
     @driving_record = DrivingRecord.new(driving_record_params)
     @driving_record.driver_id = current_driver.id
 
+    # ボタンに応じてステータスを設定
+    if params[:save_completed]
+      @driving_record.status = :completed
+    else
+      @driving_record.status = :draft
+    end
+
     respond_to do |format|
       if @driving_record.save
-        format.html { redirect_to driving_records_path, notice: "運転記録を登録しました。" }
-        format.turbo_stream { redirect_to driving_records_path, notice: "運転記録を登録しました。" }
+        message = @driving_record.completed? ? "運転記録を登録しました。" : "下書きを保存しました。"
+        format.html { redirect_to driving_records_path, notice: message }
+        format.json { render json: { id: @driving_record.id, message: message }, status: :created }
+        format.turbo_stream { redirect_to driving_records_path, notice: message }
       else
+        Rails.logger.error "Validation errors: #{@driving_record.errors.full_messages.join(', ')}"
         format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @driving_record.errors }, status: :unprocessable_entity }
         format.turbo_stream { render :new, status: :unprocessable_entity }
       end
     end
@@ -37,12 +48,22 @@ class DrivingRecordsController < ApplicationController
   end
 
   def update
+    # ボタンに応じてステータスを設定
+    if params[:save_completed]
+      @driving_record.status = :completed
+    elsif params[:save_draft]
+      @driving_record.status = :draft
+    end
+
     respond_to do |format|
       if @driving_record.update(driving_record_params)
-        format.html { redirect_to driving_record_path(@driving_record), notice: "運転記録を更新しました。" }
-        format.turbo_stream { redirect_to driving_record_path(@driving_record), notice: "運転記録を更新しました。" }
+        message = @driving_record.completed? ? "運転記録を更新しました。" : "下書きを保存しました。"
+        format.html { redirect_to driving_record_path(@driving_record), notice: message }
+        format.json { render json: { id: @driving_record.id, message: message }, status: :ok }
+        format.turbo_stream { redirect_to driving_record_path(@driving_record), notice: message }
       else
         format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @driving_record.errors }, status: :unprocessable_entity }
         format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
     end
@@ -100,18 +121,22 @@ class DrivingRecordsController < ApplicationController
       :departure_latitude,
       :departure_longitude,
       :store_id,
-      :waypoint_location,
-      :waypoint_latitude,
-      :waypoint_longitude,
+      :store_name,
       :arrival_datetime,
       :destination,
       :destination_latitude,
       :destination_longitude,
       :distance,
-      :amount,
+      :fare_amount,
+      :highway_fee,
+      :parking_fee,
+      :other_fee,
       :vehicle_id,
       :customer_id,
-      :notes
+      :customer_name,
+      :notes,
+      :status,
+      waypoints_attributes: [ :id, :sequence, :location, :latitude, :longitude, :_destroy ]
     )
   end
 end
