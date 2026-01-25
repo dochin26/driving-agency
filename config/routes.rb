@@ -30,7 +30,6 @@ Rails.application.routes.draw do
       end
     end
     resources :vehicles
-    resources :stores
     resources :customers
     resources :daily_report_settings, only: [ :index, :edit, :update ]
   end

@@ -60,25 +60,6 @@
                     required: false %>
               </div>
 
-              <div class="form-control">
-                <%= f.label :store_id, class: "label" do %>
-                  <span class="label-text text-sm font-medium">店舗</span>
-                <% end %>
-                <%= f.collection_select :store_id,
-                    Store.all, :id, :name,
-                    { prompt: "店舗を選択", include_blank: "手入力する" },
-                    { class: "select select-bordered w-full" } %>
-              </div>
-
-              <div class="form-control">
-                <%= f.label :store_name, class: "label" do %>
-                  <span class="label-text text-sm font-medium">店舗名（手入力）</span>
-                <% end %>
-                <%= f.text_field :store_name,
-                    class: "input input-bordered w-full",
-                    placeholder: "店舗を選択しない場合は手入力" %>
-              </div>
-
               <div class="form-control" data-controller="geolocation">
                 <%= f.label :departure_location, class: "label" do %>
                   <span class="label-text text-sm font-medium">出発地点</span>
@@ -100,6 +81,16 @@
                 </div>
                 <%= f.hidden_field :departure_latitude, data: { geolocation_target: "latitudeField" } %>
                 <%= f.hidden_field :departure_longitude, data: { geolocation_target: "longitudeField" } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :departure_note, class: "label" do %>
+                  <span class="label-text text-sm font-medium">出発情報の備考</span>
+                <% end %>
+                <%= f.text_field :departure_note,
+                    class: "input input-bordered w-full",
+                    placeholder: "例：○○店、△△様宅など",
+                    required: false %>
               </div>
             </div>
           </div>

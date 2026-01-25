@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_25_150440) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
     t.decimal "departure_latitude", precision: 10, scale: 7
     t.string "departure_location"
     t.decimal "departure_longitude", precision: 10, scale: 7
+    t.string "departure_note"
     t.string "destination"
     t.decimal "destination_latitude", precision: 10, scale: 7
     t.decimal "destination_longitude", precision: 10, scale: 7
@@ -71,26 +72,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
     t.integer "other_fee", default: 0
     t.integer "parking_fee", default: 0
     t.integer "status", default: 0, null: false
-    t.bigint "store_id"
-    t.string "store_name"
     t.datetime "updated_at", null: false
     t.bigint "vehicle_id"
     t.index ["customer_id"], name: "index_driving_records_on_customer_id"
     t.index ["departure_datetime"], name: "index_driving_records_on_departure_datetime"
     t.index ["driver_id"], name: "index_driving_records_on_driver_id"
     t.index ["status"], name: "index_driving_records_on_status"
-    t.index ["store_id"], name: "index_driving_records_on_store_id"
     t.index ["vehicle_id"], name: "index_driving_records_on_vehicle_id"
-  end
-
-  create_table "stores", force: :cascade do |t|
-    t.string "address"
-    t.datetime "created_at", null: false
-    t.decimal "latitude", precision: 10, scale: 7
-    t.decimal "longitude", precision: 10, scale: 7
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_stores_on_name"
   end
 
   create_table "vehicles", force: :cascade do |t|
@@ -115,7 +103,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
 
   add_foreign_key "driving_records", "customers"
   add_foreign_key "driving_records", "drivers"
-  add_foreign_key "driving_records", "stores"
   add_foreign_key "driving_records", "vehicles"
   add_foreign_key "waypoints", "driving_records"
 end
