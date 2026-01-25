@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "3.4.5"
 
 # Rails 8.1.1
-gem "rails", "~> 8.1.1"
+gem "rails", "~> 8.1.2"
 
 # PostgreSQL adapter
 gem "pg", "~> 1.6"
