@@ -8,7 +8,6 @@ class DrivingRecord < ApplicationRecord
   # Associations
   belongs_to :driver
   belongs_to :vehicle, optional: true
-  belongs_to :store, optional: true
   belongs_to :customer, optional: true
   has_many :waypoints, -> { order(:sequence) }, dependent: :destroy
 
@@ -22,9 +21,6 @@ class DrivingRecord < ApplicationRecord
   validates :distance, presence: true, numericality: { greater_than_or_equal_to: 0 }, if: :completed?
   validates :vehicle_id, presence: true, if: :completed?
   validates :waypoints, length: { maximum: 10 }
-
-  # 店舗名または店舗IDのいずれかが必須
-  validate :store_name_or_store_id_present, if: :completed?
 
   # 金額のバリデーション
   validates :fare_amount, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
@@ -49,11 +45,6 @@ class DrivingRecord < ApplicationRecord
     (fare_amount || 0) + (highway_fee || 0) + (parking_fee || 0) + (other_fee || 0)
   end
 
-  # 店舗名を取得（店舗IDがあればその名前、なければ手入力の店舗名）
-  def store_display_name
-    store&.name || attributes["store_name"]
-  end
-
   # 顧客名を取得（顧客IDがあればその名前、なければ手入力の顧客名）
   def customer_display_name
     customer&.name || customer_name
@@ -68,12 +59,6 @@ class DrivingRecord < ApplicationRecord
   def set_completed_at
     if status == "completed" && completed_at.nil?
       self.completed_at = Time.current
-    end
-  end
-
-  def store_name_or_store_id_present
-    if store_id.blank? && attributes["store_name"].blank?
-      errors.add(:base, "店舗名または店舗を選択してください")
     end
   end
 end

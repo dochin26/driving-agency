@@ -88,8 +88,8 @@
                       <div class="text-sm text-base-content/80 truncate">
                         <% if draft.departure_location.present? %>
                           <%= draft.departure_location %>
-                        <% elsif draft.store_name.present? || draft.store.present? %>
-                          <%= draft.store_display_name %>
+                        <% elsif draft.departure_note.present? %>
+                          <%= draft.departure_note %>
                         <% else %>
                           入力を開始しました
                         <% end %>

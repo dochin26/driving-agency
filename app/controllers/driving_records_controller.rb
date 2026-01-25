@@ -3,7 +3,7 @@ class DrivingRecordsController < ApplicationController
   before_action :set_driving_record, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @driving_records = DrivingRecord.includes(:driver, :vehicle, :store, :customer)
+    @driving_records = DrivingRecord.includes(:driver, :vehicle, :customer)
                                      .recent
                                      .page(params[:page])
                                      .per(20)
@@ -95,7 +95,7 @@ class DrivingRecordsController < ApplicationController
     end
 
     # 日報データを取得
-    @records = DrivingRecord.includes(:driver, :vehicle, :store, :customer)
+    @records = DrivingRecord.includes(:driver, :vehicle, :customer)
                             .where(departure_datetime: start_datetime...end_datetime)
 
     @records = @records.where(vehicle_id: @vehicle_id) if @vehicle_id.present?
@@ -120,8 +120,7 @@ class DrivingRecordsController < ApplicationController
       :departure_location,
       :departure_latitude,
       :departure_longitude,
-      :store_id,
-      :store_name,
+      :departure_note,
       :arrival_datetime,
       :destination,
       :destination_latitude,

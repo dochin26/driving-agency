@@ -35,7 +35,7 @@
                   <% end %>
                 </div>
                 <div class="flex items-center gap-2 text-sm mb-2">
-                  <span class="truncate flex-1"><%= record.store_display_name || "-" %></span>
+                  <span class="truncate flex-1"><%= record.departure_location || record.departure_note || "-" %></span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
@@ -85,7 +85,7 @@
                     <span class="badge badge-warning badge-sm ml-2">下書き</span>
                   <% end %>
                 </td>
-                <td><%= record.store_display_name || "-" %></td>
+                <td><%= record.departure_location || record.departure_note || "-" %></td>
                 <td><%= record.destination || "-" %></td>
                 <td><%= record.distance ? "#{record.distance}km" : "-" %></td>
                 <td>¥<%= number_with_delimiter(record.amount || 0) %></td>

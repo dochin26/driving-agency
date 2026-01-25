@@ -32,13 +32,13 @@
           </div>
 
           <div>
-            <p class="text-sm text-gray-500">店舗名</p>
-            <p class="font-semibold"><%= @driving_record.store.name %></p>
+            <p class="text-sm text-gray-500">出発情報の備考</p>
+            <p class="font-semibold"><%= @driving_record.departure_note || "未設定" %></p>
           </div>
 
           <div class="md:col-span-2">
             <p class="text-sm text-gray-500">出発地点</p>
-            <p class="font-semibold"><%= @driving_record.departure_location || @driving_record.store.address || "未設定" %></p>
+            <p class="font-semibold"><%= @driving_record.departure_location || "未設定" %></p>
             <% if @driving_record.departure_latitude && @driving_record.departure_longitude %>
               <p class="text-xs text-gray-400 mt-1">
                 📍 <%= @driving_record.departure_latitude.round(6) %>, <%= @driving_record.departure_longitude.round(6) %>
@@ -50,18 +50,22 @@
         </div>
 
         <!-- 経由地 -->
-        <% if @driving_record.waypoint_location.present? %>
+        <% if @driving_record.waypoints.any? %>
           <div class="divider">経由地</div>
 
-          <div>
-            <p class="text-sm text-gray-500">経由地</p>
-            <p class="font-semibold"><%= @driving_record.waypoint_location %></p>
-            <% if @driving_record.waypoint_latitude && @driving_record.waypoint_longitude %>
-              <p class="text-xs text-gray-400 mt-1">
-                📍 <%= @driving_record.waypoint_latitude.round(6) %>, <%= @driving_record.waypoint_longitude.round(6) %>
-                <%= link_to "地図で見る", "https://www.google.com/maps?q=#{@driving_record.waypoint_latitude},#{@driving_record.waypoint_longitude}",
-                    target: "_blank", class: "link link-primary ml-2" %>
-              </p>
+          <div class="space-y-3">
+            <% @driving_record.waypoints.each do |waypoint| %>
+              <div>
+                <p class="text-sm text-gray-500">経由地 <%= waypoint.sequence %></p>
+                <p class="font-semibold"><%= waypoint.location %></p>
+                <% if waypoint.latitude && waypoint.longitude %>
+                  <p class="text-xs text-gray-400 mt-1">
+                    📍 <%= waypoint.latitude.round(6) %>, <%= waypoint.longitude.round(6) %>
+                    <%= link_to "地図で見る", "https://www.google.com/maps?q=#{waypoint.latitude},#{waypoint.longitude}",
+                        target: "_blank", class: "link link-primary ml-2" %>
+                  </p>
+                <% end %>
+              </div>
             <% end %>
           </div>
         <% end %>
@@ -72,7 +76,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p class="text-sm text-gray-500">到着日時</p>
-            <p class="font-semibold"><%= @driving_record.arrival_datetime.strftime("%Y年%m月%d日 %H:%M") %></p>
+            <p class="font-semibold"><%= @driving_record.arrival_datetime&.strftime("%Y年%m月%d日 %H:%M") || "未設定" %></p>
           </div>
 
           <div>
@@ -109,8 +113,8 @@
 
           <div class="stat">
             <div class="stat-title">車両</div>
-            <div class="stat-value text-lg"><%= @driving_record.vehicle.vehicle_number %></div>
-            <div class="stat-desc"><%= @driving_record.vehicle.vehicle_info %></div>
+            <div class="stat-value text-lg"><%= @driving_record.vehicle&.vehicle_number || "未設定" %></div>
+            <div class="stat-desc"><%= @driving_record.vehicle&.vehicle_info || "-" %></div>
           </div>
 
           <div class="stat">

@@ -55,32 +55,28 @@
               </div>
 
               <div class="form-control">
-                <%= f.label :store_id, "店舗", class: "label" %>
-                <%= f.collection_select :store_id,
-                    Store.all, :id, :name,
-                    { prompt: "店舗を選択", include_blank: "手入力する" },
-                    { class: "select select-bordered w-full" } %>
-              </div>
-
-              <div class="form-control">
-                <%= f.label :store_name, "店舗名（手入力）", class: "label" %>
-                <%= f.text_field :store_name,
+                <%= f.label :departure_note, "出発情報の備考", class: "label" %>
+                <%= f.text_field :departure_note,
                     class: "input input-bordered w-full",
-                    placeholder: "店舗を選択しない場合は手入力" %>
+                    placeholder: "例：○○店、△△様宅など",
+                    required: false %>
               </div>
 
               <div class="form-control" data-controller="geolocation">
                 <%= f.label :departure_location, "出発地点", class: "label" %>
-                <div class="join w-full">
+                <div class="flex gap-2">
                   <%= f.text_field :departure_location,
-                      class: "input input-bordered join-item flex-1",
-                      placeholder: "例：福岡県福岡市中央区天神2-1-1",
+                      class: "input input-bordered flex-1 min-w-0",
+                      placeholder: "現在地ボタンで取得",
                       data: { geolocation_target: "addressField" } %>
                   <button type="button"
-                          class="btn btn-secondary join-item"
+                          class="btn btn-secondary flex-shrink-0"
                           data-geolocation-target="button"
                           data-action="click->geolocation#getCurrentLocation">
-                    📍 現在地
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                   </button>
                 </div>
                 <%= f.hidden_field :departure_latitude, data: { geolocation_target: "latitudeField" } %>
@@ -114,16 +110,19 @@
                         <%= waypoint_form.hidden_field :_destroy %>
 
                         <div class="form-control" data-controller="geolocation">
-                          <div class="join w-full">
+                          <div class="flex gap-2">
                             <%= waypoint_form.text_field :location,
-                                class: "input input-bordered input-sm join-item flex-1",
-                                placeholder: "例：福岡県福岡市博多区中洲4-5-6",
+                                class: "input input-bordered input-sm flex-1 min-w-0",
+                                placeholder: "現在地ボタンで取得",
                                 data: { geolocation_target: "addressField" } %>
                             <button type="button"
-                                    class="btn btn-secondary btn-sm join-item"
+                                    class="btn btn-secondary btn-sm flex-shrink-0"
                                     data-geolocation-target="button"
                                     data-action="click->geolocation#getCurrentLocation">
-                              📍 現在地
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
                             </button>
                           </div>
                           <%= waypoint_form.hidden_field :latitude, data: { geolocation_target: "latitudeField" } %>
@@ -157,16 +156,19 @@
                       <%= waypoint_form.hidden_field :_destroy %>
 
                       <div class="form-control" data-controller="geolocation">
-                        <div class="join w-full">
+                        <div class="flex gap-2">
                           <%= waypoint_form.text_field :location,
-                              class: "input input-bordered input-sm join-item flex-1",
-                              placeholder: "例：福岡県福岡市博多区中洲4-5-6",
+                              class: "input input-bordered input-sm flex-1 min-w-0",
+                              placeholder: "現在地ボタンで取得",
                               data: { geolocation_target: "addressField" } %>
                           <button type="button"
-                                  class="btn btn-secondary btn-sm join-item"
+                                  class="btn btn-secondary btn-sm flex-shrink-0"
                                   data-geolocation-target="button"
                                   data-action="click->geolocation#getCurrentLocation">
-                            📍 現在地
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
                           </button>
                         </div>
                         <%= waypoint_form.hidden_field :latitude, data: { geolocation_target: "latitudeField" } %>
@@ -194,16 +196,19 @@
 
               <div class="form-control" data-controller="geolocation">
                 <%= f.label :destination, "目的地", class: "label" %>
-                <div class="join w-full">
+                <div class="flex gap-2">
                   <%= f.text_field :destination,
-                      class: "input input-bordered join-item flex-1",
-                      placeholder: "例：福岡県福岡市博多区博多駅前3-2-1",
+                      class: "input input-bordered flex-1 min-w-0",
+                      placeholder: "現在地ボタンで取得",
                       data: { geolocation_target: "addressField" } %>
                   <button type="button"
-                          class="btn btn-secondary join-item"
+                          class="btn btn-secondary flex-shrink-0"
                           data-geolocation-target="button"
                           data-action="click->geolocation#getCurrentLocation">
-                    📍 現在地
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                   </button>
                 </div>
                 <%= f.hidden_field :destination_latitude, data: { geolocation_target: "latitudeField" } %>
