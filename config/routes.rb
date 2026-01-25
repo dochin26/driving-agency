@@ -2,8 +2,14 @@ Rails.application.routes.draw do
   # Devise routes for Driver authentication
   devise_for :drivers
 
-  # Root route
-  root "dashboard#index"
+  # Root route (redirect to dashboard if logged in)
+  authenticated :driver do
+    root to: "dashboard#index", as: :authenticated_root
+  end
+
+  devise_scope :driver do
+    root to: "devise/sessions#new"
+  end
 
   # Dashboard
   get "dashboard", to: "dashboard#index"

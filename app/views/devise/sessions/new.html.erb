@@ -1,0 +1,64 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-secondary p-4">
+  <div class="card w-full max-w-sm bg-base-100 shadow-2xl">
+    <div class="card-body px-6 py-8">
+      <!-- ロゴ・タイトルエリア -->
+      <div class="text-center mb-4 md:mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-primary mb-2">運転代行管理システム</h1>
+        <p class="text-sm md:text-base text-base-content/70">ログイン</p>
+      </div>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-3 md:space-y-4" }) do |f| %>
+        <!-- エラーメッセージ -->
+        <% if flash[:alert] %>
+          <div class="alert alert-error text-sm md:text-base">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span><%= flash[:alert] %></span>
+          </div>
+        <% end %>
+
+        <!-- メールアドレス -->
+        <div class="form-control">
+          <%= f.label :email, "メールアドレス", class: "label text-sm md:text-base" %>
+          <%= f.email_field :email,
+              autofocus: true,
+              autocomplete: "email",
+              placeholder: "example@example.com",
+              class: "input input-bordered w-full text-sm md:text-base" %>
+        </div>
+
+        <!-- パスワード -->
+        <div class="form-control">
+          <%= f.label :password, "パスワード", class: "label text-sm md:text-base" %>
+          <%= f.password_field :password,
+              autocomplete: "current-password",
+              placeholder: "パスワードを入力",
+              class: "input input-bordered w-full text-sm md:text-base" %>
+        </div>
+
+        <!-- ログイン状態を保持 -->
+        <% if devise_mapping.rememberable? %>
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-2">
+              <%= f.check_box :remember_me, class: "checkbox checkbox-primary checkbox-sm md:checkbox-md" %>
+              <span class="label-text text-sm md:text-base">ログイン状態を保持する</span>
+            </label>
+          </div>
+        <% end %>
+
+        <!-- ログインボタン -->
+        <div class="form-control mt-4 md:mt-6">
+          <%= f.submit "ログイン", class: "btn btn-primary w-full text-sm md:text-base" %>
+        </div>
+      <% end %>
+
+      <!-- パスワード忘れリンクのみ表示 -->
+      <% if devise_mapping.recoverable? %>
+        <div class="text-center mt-4">
+          <%= link_to "パスワードをお忘れですか？", new_password_path(resource_name), class: "link link-secondary text-xs md:text-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
