@@ -36,7 +36,7 @@ gem "bootsnap", require: false
 # gem "image_processing", "~> 1.2"
 
 # Authentication
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 
 # Tailwind CSS + daisyUI
 gem "tailwindcss-rails", "~> 3.0"
