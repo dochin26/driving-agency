@@ -6,16 +6,27 @@
       <ul>
         <li><%= link_to "ダッシュボード", dashboard_path %></li>
         <li><%= link_to "運転記録", driving_records_path %></li>
-        <li><%= link_to "詳細", driving_record_path(@driving_record) %></li>
+        <% if @driving_record.completed? %>
+          <li><%= link_to "詳細", driving_record_path(@driving_record) %></li>
+        <% end %>
         <li>編集</li>
       </ul>
     </div>
+
+    <% if @driving_record.draft? %>
+      <div class="alert alert-info shadow-lg mb-4">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>下書きから続きを入力します</span>
+        </div>
+      </div>
+    <% end %>
 
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
         <h2 class="card-title text-2xl mb-6">運転記録 編集</h2>
 
-        <%= form_with(model: @driving_record, class: "space-y-4", data: { controller: "driving-record-form" }) do |f| %>
+        <%= form_with(model: @driving_record, class: "space-y-6") do |f| %>
           <% if @driving_record.errors.any? %>
             <div class="alert alert-error">
               <div>
@@ -30,132 +41,293 @@
           <% end %>
 
           <!-- 出発情報 -->
-          <div class="divider">出発情報</div>
+          <div class="card bg-base-200">
+            <div class="card-body">
+              <h3 class="card-title text-lg">📍 出発情報</h3>
 
-          <div class="form-control">
-            <%= f.label :departure_datetime, "出発日時", class: "label" %>
-            <%= f.datetime_local_field :departure_datetime, class: "input input-bordered w-full" %>
-          </div>
+              <div class="form-control">
+                <%= f.label :departure_datetime, class: "label" do %>
+                  <span class="label-text">出発日時 <span class="text-error">*</span></span>
+                <% end %>
+                <%= f.datetime_local_field :departure_datetime,
+                    class: "input input-bordered w-full",
+                    required: false %>
+              </div>
 
-          <div class="form-control">
-            <%= f.label :store_id, "店舗名（必須）", class: "label" %>
-            <%= f.collection_select :store_id,
-                Store.all, :id, :name,
-                {},
-                {
-                  class: "select select-bordered w-full",
-                  data: {
-                    driving_record_form_target: "storeSelect",
-                    action: "change->driving-record-form#updateDepartureLocation"
-                  }
-                } do |store| %>
-              <option value="<%= store.id %>" data-address="<%= store.address %>" <%= 'selected' if store.id == @driving_record.store_id %>><%= store.name %></option>
-            <% end %>
-          </div>
+              <div class="form-control">
+                <%= f.label :store_id, "店舗", class: "label" %>
+                <%= f.collection_select :store_id,
+                    Store.all, :id, :name,
+                    { prompt: "店舗を選択", include_blank: "手入力する" },
+                    { class: "select select-bordered w-full" } %>
+              </div>
 
-          <div class="form-control">
-            <%= f.label :departure_location, "出発地点", class: "label" %>
-            <div class="join w-full">
-              <%= f.text_field :departure_location,
-                  class: "input input-bordered join-item flex-1",
-                  placeholder: "例：福岡県福岡市中央区天神2-1-1",
-                  data: { driving_record_form_target: "departureLocation" } %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="departure">
-                📍 現在地
-              </button>
+              <div class="form-control">
+                <%= f.label :store_name, "店舗名（手入力）", class: "label" %>
+                <%= f.text_field :store_name,
+                    class: "input input-bordered w-full",
+                    placeholder: "店舗を選択しない場合は手入力" %>
+              </div>
+
+              <div class="form-control" data-controller="geolocation">
+                <%= f.label :departure_location, "出発地点", class: "label" %>
+                <div class="join w-full">
+                  <%= f.text_field :departure_location,
+                      class: "input input-bordered join-item flex-1",
+                      placeholder: "例：福岡県福岡市中央区天神2-1-1",
+                      data: { geolocation_target: "addressField" } %>
+                  <button type="button"
+                          class="btn btn-secondary join-item"
+                          data-geolocation-target="button"
+                          data-action="click->geolocation#getCurrentLocation">
+                    📍 現在地
+                  </button>
+                </div>
+                <%= f.hidden_field :departure_latitude, data: { geolocation_target: "latitudeField" } %>
+                <%= f.hidden_field :departure_longitude, data: { geolocation_target: "longitudeField" } %>
+              </div>
             </div>
-            <%= f.hidden_field :departure_latitude %>
-            <%= f.hidden_field :departure_longitude %>
           </div>
 
           <!-- 経由地 -->
-          <div class="divider">経由地（任意）</div>
+          <div class="card bg-base-200">
+            <div class="card-body">
+              <h3 class="card-title text-lg">🔄 経由地（任意）</h3>
 
-          <div class="form-control">
-            <%= f.label :waypoint_location, "経由地", class: "label" %>
-            <div class="join w-full">
-              <%= f.text_field :waypoint_location,
-                  class: "input input-bordered join-item flex-1",
-                  placeholder: "例：福岡県福岡市博多区中洲4-5-6" %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="waypoint">
-                📍 現在地
-              </button>
+              <div data-controller="waypoints"
+                   data-waypoints-count-value="<%= @driving_record.waypoints.size %>"
+                   data-waypoints-max-waypoints-value="10">
+                <div data-waypoints-target="container">
+                  <% @driving_record.waypoints.each_with_index do |waypoint, index| %>
+                    <div class="border-2 border-base-300 p-4 rounded-lg mb-4" data-waypoint-item>
+                      <%= f.fields_for :waypoints, waypoint, child_index: index do |waypoint_form| %>
+                        <div class="flex justify-between items-center mb-2">
+                          <label class="label-text font-bold">経由地<%= index + 1 %></label>
+                          <button type="button"
+                                  class="btn btn-error btn-xs"
+                                  data-action="click->waypoints#removeWaypoint">
+                            ✕ 削除
+                          </button>
+                        </div>
+
+                        <%= waypoint_form.hidden_field :sequence, value: index + 1 %>
+                        <%= waypoint_form.hidden_field :_destroy %>
+
+                        <div class="form-control" data-controller="geolocation">
+                          <div class="join w-full">
+                            <%= waypoint_form.text_field :location,
+                                class: "input input-bordered input-sm join-item flex-1",
+                                placeholder: "例：福岡県福岡市博多区中洲4-5-6",
+                                data: { geolocation_target: "addressField" } %>
+                            <button type="button"
+                                    class="btn btn-secondary btn-sm join-item"
+                                    data-geolocation-target="button"
+                                    data-action="click->geolocation#getCurrentLocation">
+                              📍 現在地
+                            </button>
+                          </div>
+                          <%= waypoint_form.hidden_field :latitude, data: { geolocation_target: "latitudeField" } %>
+                          <%= waypoint_form.hidden_field :longitude, data: { geolocation_target: "longitudeField" } %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <button type="button"
+                        class="btn btn-outline btn-sm"
+                        data-action="click->waypoints#addWaypoint">
+                  ➕ 経由地を追加
+                </button>
+
+                <!-- 経由地テンプレート -->
+                <template data-waypoints-target="template">
+                  <div class="border-2 border-dashed border-base-300 p-4 rounded-lg mb-4" data-waypoint-item>
+                    <%= f.fields_for :waypoints, Waypoint.new, child_index: 'NEW_RECORD' do |waypoint_form| %>
+                      <div class="flex justify-between items-center mb-2">
+                        <label class="label-text font-bold">経由地SEQUENCE</label>
+                        <button type="button"
+                                class="btn btn-error btn-xs"
+                                data-action="click->waypoints#removeWaypoint">
+                          ✕ 削除
+                        </button>
+                      </div>
+
+                      <%= waypoint_form.hidden_field :sequence, value: 'SEQUENCE' %>
+                      <%= waypoint_form.hidden_field :_destroy %>
+
+                      <div class="form-control" data-controller="geolocation">
+                        <div class="join w-full">
+                          <%= waypoint_form.text_field :location,
+                              class: "input input-bordered input-sm join-item flex-1",
+                              placeholder: "例：福岡県福岡市博多区中洲4-5-6",
+                              data: { geolocation_target: "addressField" } %>
+                          <button type="button"
+                                  class="btn btn-secondary btn-sm join-item"
+                                  data-geolocation-target="button"
+                                  data-action="click->geolocation#getCurrentLocation">
+                            📍 現在地
+                          </button>
+                        </div>
+                        <%= waypoint_form.hidden_field :latitude, data: { geolocation_target: "latitudeField" } %>
+                        <%= waypoint_form.hidden_field :longitude, data: { geolocation_target: "longitudeField" } %>
+                      </div>
+                    <% end %>
+                  </div>
+                </template>
+              </div>
             </div>
-            <%= f.hidden_field :waypoint_latitude %>
-            <%= f.hidden_field :waypoint_longitude %>
           </div>
 
-          <!-- 到着情報 -->
-          <div class="divider">到着情報</div>
+          <!-- 到着・運転情報 -->
+          <div class="card bg-base-200">
+            <div class="card-body">
+              <h3 class="card-title text-lg">🏁 到着・運転情報</h3>
 
-          <div class="form-control">
-            <%= f.label :arrival_datetime, "到着日時（必須）", class: "label" %>
-            <%= f.datetime_local_field :arrival_datetime, class: "input input-bordered w-full" %>
-          </div>
+              <div class="form-control">
+                <%= f.label :arrival_datetime, class: "label" do %>
+                  <span class="label-text">到着日時</span>
+                <% end %>
+                <%= f.datetime_local_field :arrival_datetime,
+                    class: "input input-bordered w-full" %>
+              </div>
 
-          <div class="form-control">
-            <%= f.label :destination, "目的地（必須）", class: "label" %>
-            <div class="join w-full">
-              <%= f.text_field :destination,
-                  class: "input input-bordered join-item flex-1",
-                  placeholder: "例：福岡県福岡市早良区西新3-4-5",
-                  data: { driving_record_form_target: "destination" } %>
-              <button type="button" class="btn btn-secondary join-item" data-action="click->driving-record-form#getCurrentLocation" data-target="destination">
-                📍 現在地
-              </button>
+              <div class="form-control" data-controller="geolocation">
+                <%= f.label :destination, "目的地", class: "label" %>
+                <div class="join w-full">
+                  <%= f.text_field :destination,
+                      class: "input input-bordered join-item flex-1",
+                      placeholder: "例：福岡県福岡市博多区博多駅前3-2-1",
+                      data: { geolocation_target: "addressField" } %>
+                  <button type="button"
+                          class="btn btn-secondary join-item"
+                          data-geolocation-target="button"
+                          data-action="click->geolocation#getCurrentLocation">
+                    📍 現在地
+                  </button>
+                </div>
+                <%= f.hidden_field :destination_latitude, data: { geolocation_target: "latitudeField" } %>
+                <%= f.hidden_field :destination_longitude, data: { geolocation_target: "longitudeField" } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :customer_id, "顧客", class: "label" %>
+                <%= f.collection_select :customer_id,
+                    Customer.all, :id, :name,
+                    { prompt: "顧客を選択", include_blank: "顧客なし" },
+                    { class: "select select-bordered w-full" } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :customer_name, "顧客名（手入力）", class: "label" %>
+                <%= f.text_field :customer_name,
+                    class: "input input-bordered w-full",
+                    placeholder: "顧客を選択しない場合は手入力" %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :vehicle_id, "車両", class: "label" %>
+                <%= f.collection_select :vehicle_id,
+                    Vehicle.all, :id, :vehicle_number,
+                    { prompt: "車両を選択" },
+                    { class: "select select-bordered w-full" } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :distance, "走行距離（km）", class: "label" %>
+                <%= f.number_field :distance,
+                    class: "input input-bordered w-full",
+                    step: 0.1,
+                    min: 0,
+                    placeholder: "例：15.5" %>
+              </div>
             </div>
-            <%= f.hidden_field :destination_latitude %>
-            <%= f.hidden_field :destination_longitude %>
           </div>
 
-          <div class="form-control">
-            <%= f.label :customer_id, "顧客", class: "label" %>
-            <%= f.collection_select :customer_id,
-                Customer.all, :id, :name,
-                { include_blank: "顧客を選択（任意）" },
-                {
-                  class: "select select-bordered w-full",
-                  data: {
-                    driving_record_form_target: "customerSelect",
-                    action: "change->driving-record-form#updateDestination"
-                  }
-                } do |customer| %>
-              <option value="<%= customer.id %>" data-address="<%= customer.address %>" <%= 'selected' if customer.id == @driving_record.customer_id %>><%= customer.name %></option>
-            <% end %>
-          </div>
+          <!-- 料金情報 -->
+          <div class="card bg-base-200">
+            <div class="card-body" data-controller="amount-calculator">
+              <h3 class="card-title text-lg">💰 料金情報</h3>
 
-          <!-- 運転情報 -->
-          <div class="divider">運転情報</div>
+              <div class="form-control">
+                <%= f.label :fare_amount, "運賃", class: "label" %>
+                <%= f.number_field :fare_amount,
+                    class: "input input-bordered w-full",
+                    min: 0,
+                    value: @driving_record.fare_amount || 0,
+                    data: {
+                      amount_calculator_target: "fareAmount",
+                      action: "input->amount-calculator#calculate"
+                    } %>
+              </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-control">
-              <%= f.label :distance, "走行距離（km）（必須）", class: "label" %>
-              <%= f.number_field :distance, step: 0.1, class: "input input-bordered w-full", placeholder: "10.5" %>
+              <div class="form-control">
+                <%= f.label :highway_fee, "高速料金", class: "label" %>
+                <%= f.number_field :highway_fee,
+                    class: "input input-bordered w-full",
+                    min: 0,
+                    value: @driving_record.highway_fee || 0,
+                    data: {
+                      amount_calculator_target: "highwayFee",
+                      action: "input->amount-calculator#calculate"
+                    } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :parking_fee, "駐車料金", class: "label" %>
+                <%= f.number_field :parking_fee,
+                    class: "input input-bordered w-full",
+                    min: 0,
+                    value: @driving_record.parking_fee || 0,
+                    data: {
+                      amount_calculator_target: "parkingFee",
+                      action: "input->amount-calculator#calculate"
+                    } %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :other_fee, "その他料金", class: "label" %>
+                <%= f.number_field :other_fee,
+                    class: "input input-bordered w-full",
+                    min: 0,
+                    value: @driving_record.other_fee || 0,
+                    data: {
+                      amount_calculator_target: "otherFee",
+                      action: "input->amount-calculator#calculate"
+                    } %>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="flex justify-between items-center p-4 bg-primary/10 rounded-lg">
+                <span class="text-lg font-bold">合計金額</span>
+                <span class="text-2xl font-bold text-primary" data-amount-calculator-target="totalAmount">¥<%= number_with_delimiter(@driving_record.total_amount) %></span>
+              </div>
             </div>
-
-            <div class="form-control">
-              <%= f.label :amount, "金額（円）（必須）", class: "label" %>
-              <%= f.number_field :amount, class: "input input-bordered w-full", placeholder: "3000" %>
-            </div>
-          </div>
-
-          <div class="form-control">
-            <%= f.label :vehicle_id, "車両番号（必須）", class: "label" %>
-            <%= f.collection_select :vehicle_id, Vehicle.all, :id, :vehicle_number, {}, class: "select select-bordered w-full" %>
           </div>
 
           <!-- 備考 -->
-          <div class="divider">備考</div>
+          <div class="card bg-base-200">
+            <div class="card-body">
+              <h3 class="card-title text-lg">📝 備考</h3>
 
-          <div class="form-control">
-            <%= f.label :notes, "備考", class: "label" %>
-            <%= f.text_area :notes, rows: 3, class: "textarea textarea-bordered w-full", placeholder: "引き継ぎ事項など" %>
+              <div class="form-control">
+                <%= f.label :notes, class: "label" do %>
+                  <span class="label-text">備考（任意）</span>
+                <% end %>
+                <%= f.text_area :notes,
+                    class: "textarea textarea-bordered w-full",
+                    rows: 3,
+                    placeholder: "特記事項があれば記入してください" %>
+              </div>
+            </div>
           </div>
 
-          <!-- アクション -->
-          <div class="card-actions justify-end mt-6">
-            <%= link_to "キャンセル", driving_record_path(@driving_record), class: "btn btn-ghost" %>
-            <%= f.submit "更新する", class: "btn btn-primary" %>
+          <!-- 送信ボタン -->
+          <div class="flex gap-4 justify-end">
+            <%= link_to "キャンセル", driving_records_path, class: "btn btn-ghost" %>
+            <%= f.submit "下書き保存", name: "save_draft", class: "btn btn-outline btn-primary" %>
+            <%= f.submit "完了して登録", name: "save_completed", class: "btn btn-primary" %>
           </div>
         <% end %>
       </div>

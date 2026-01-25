@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_06_122110) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_06_131619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,7 +51,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_122110) do
 
   create_table "driving_records", force: :cascade do |t|
     t.integer "amount", null: false
-    t.datetime "arrival_datetime", null: false
+    t.datetime "arrival_datetime"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.bigint "customer_id"
@@ -60,10 +60,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_122110) do
     t.decimal "departure_latitude", precision: 10, scale: 7
     t.string "departure_location"
     t.decimal "departure_longitude", precision: 10, scale: 7
-    t.string "destination", null: false
+    t.string "destination"
     t.decimal "destination_latitude", precision: 10, scale: 7
     t.decimal "destination_longitude", precision: 10, scale: 7
-    t.decimal "distance", precision: 8, scale: 2, null: false
+    t.decimal "distance", precision: 8, scale: 2
     t.bigint "driver_id", null: false
     t.integer "fare_amount", default: 0
     t.integer "highway_fee", default: 0
@@ -72,8 +72,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_122110) do
     t.integer "parking_fee", default: 0
     t.integer "status", default: 0, null: false
     t.bigint "store_id"
+    t.string "store_name"
     t.datetime "updated_at", null: false
-    t.bigint "vehicle_id", null: false
+    t.bigint "vehicle_id"
     t.index ["customer_id"], name: "index_driving_records_on_customer_id"
     t.index ["departure_datetime"], name: "index_driving_records_on_departure_datetime"
     t.index ["driver_id"], name: "index_driving_records_on_driver_id"

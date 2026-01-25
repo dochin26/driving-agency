@@ -1,46 +1,164 @@
-<div class="min-h-screen bg-base-200">
+<div class="min-h-screen bg-base-200 pb-20 md:pb-0">
   <!-- ナビゲーションバー -->
   <%= render "shared/navbar" %>
 
+  <!-- FAB（新規登録ボタン）スマホのみ -->
+  <%= link_to new_driving_record_path, class: "btn btn-primary btn-circle btn-lg fixed bottom-20 right-4 md:hidden shadow-xl z-30" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+  <% end %>
+
   <!-- メインコンテンツ -->
-  <div class="container mx-auto p-4">
-    <div class="hero bg-base-100 rounded-lg shadow-xl mb-6">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="text-5xl font-bold">ようこそ、<%= current_driver.name %>さん</h1>
-          <p class="py-6">運転代行管理システムへようこそ。今日も安全運転でお願いします。</p>
-          <%= link_to "新規運転記録を登録", new_driving_record_path, class: "btn btn-primary" %>
+  <div class="p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- ウェルカムカード -->
+      <div class="card bg-gradient-to-br from-primary to-secondary text-primary-content shadow-xl mb-6 md:mb-8">
+        <div class="card-body p-4 md:p-6">
+          <h2 class="text-xl md:text-2xl font-bold mb-1">おかえりなさい、<%= current_driver.name %>さん</h2>
+          <p class="text-sm opacity-90">今日も安全運転でお願いします</p>
+          <%= link_to new_driving_record_path, class: "btn btn-accent mt-4 hidden md:inline-flex" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            新規運転記録を登録
+          <% end %>
         </div>
       </div>
-    </div>
 
-    <!-- 統計情報 -->
-    <div class="stats shadow w-full mb-6">
-      <div class="stat">
-        <div class="stat-title">今日の運転記録</div>
-        <div class="stat-value text-primary">0件</div>
-        <div class="stat-desc">合計金額: ¥0</div>
+      <!-- 統計情報 -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+          <div class="card-body p-4">
+            <div class="text-xs text-base-content/60 mb-1">今日の記録</div>
+            <div class="text-2xl md:text-3xl font-bold text-primary">0<span class="text-sm ml-1">件</span></div>
+            <div class="text-xs text-base-content/50 mt-1">¥0</div>
+          </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+          <div class="card-body p-4">
+            <div class="text-xs text-base-content/60 mb-1">今月の記録</div>
+            <div class="text-2xl md:text-3xl font-bold text-secondary">0<span class="text-sm ml-1">件</span></div>
+            <div class="text-xs text-base-content/50 mt-1">¥0</div>
+          </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+          <div class="card-body p-4">
+            <div class="text-xs text-base-content/60 mb-1">走行距離（今月）</div>
+            <div class="text-2xl md:text-3xl font-bold">0<span class="text-sm ml-1">km</span></div>
+            <div class="text-xs text-base-content/50 mt-1 invisible">placeholder</div>
+          </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+          <div class="card-body p-4">
+            <div class="text-xs text-base-content/60 mb-1">合計金額（今月）</div>
+            <div class="text-2xl md:text-3xl font-bold text-accent">¥0</div>
+            <div class="text-xs text-base-content/50 mt-1 invisible">placeholder</div>
+          </div>
+        </div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">今月の運転記録</div>
-        <div class="stat-value text-secondary">0件</div>
-        <div class="stat-desc">合計金額: ¥0</div>
-      </div>
+      <!-- 下書き一覧 -->
+      <% if @draft_records.any? %>
+        <div class="card bg-warning/10 border-2 border-warning/30 shadow-md mb-6 md:mb-8">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <h3 class="font-bold text-base">入力中の記録</h3>
+            <span class="badge badge-warning badge-sm"><%= @draft_records.count %></span>
+          </div>
 
-      <div class="stat">
-        <div class="stat-title">総走行距離（今月）</div>
-        <div class="stat-value">0km</div>
-      </div>
-    </div>
+          <div class="space-y-2">
+            <% @draft_records.each do |draft| %>
+              <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                <div class="card-body p-3">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="badge badge-xs badge-outline">下書き</span>
+                        <% if draft.departure_datetime.present? %>
+                          <span class="text-xs text-base-content/60"><%= draft.departure_datetime.strftime("%m/%d %H:%M") %></span>
+                        <% end %>
+                      </div>
+                      <div class="text-sm text-base-content/80 truncate">
+                        <% if draft.departure_location.present? %>
+                          <%= draft.departure_location %>
+                        <% elsif draft.store_name.present? || draft.store.present? %>
+                          <%= draft.store_display_name %>
+                        <% else %>
+                          入力を開始しました
+                        <% end %>
+                        <% if draft.destination.present? %>
+                          → <%= draft.destination %>
+                        <% end %>
+                      </div>
+                      <div class="text-xs text-base-content/50 mt-1">
+                        <%= time_ago_in_words(draft.updated_at) %>前に更新
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <%= link_to edit_driving_record_path(draft), class: "btn btn-xs btn-primary" do %>
+                        続ける
+                      <% end %>
+                      <%= link_to driving_record_path(draft),
+                          data: { turbo_method: :delete, turbo_confirm: "この下書きを削除しますか？" },
+                          class: "btn btn-xs btn-ghost text-error" do %>
+                        削除
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          </div>
+        </div>
+      <% end %>
 
-    <!-- 最近の運転記録 -->
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title">最近の運転記録</h2>
+      <!-- 最近の運転記録 -->
+      <div class="card bg-base-100 shadow-md">
+        <div class="card-body p-4 md:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-base md:text-lg">最近の運転記録</h2>
+            <%= link_to driving_records_path, class: "text-xs md:text-sm text-primary hover:underline" do %>
+              すべて見る →
+            <% end %>
+          </div>
         <% if @recent_records.any? %>
-          <div class="overflow-x-auto">
-            <table class="table">
+          <!-- スマホ：カード型 -->
+          <div class="space-y-2 md:hidden">
+            <% @recent_records.each do |record| %>
+              <div class="card bg-base-200 shadow-sm">
+                <div class="card-body p-3">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="text-xs text-base-content/60">
+                      <%= record.departure_datetime.strftime("%m/%d %H:%M") %>
+                    </div>
+                    <div class="badge badge-sm badge-outline"><%= record.vehicle.vehicle_number %></div>
+                  </div>
+                  <div class="flex items-center gap-2 text-sm mb-1">
+                    <span class="truncate flex-1"><%= record.store.name %></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span class="truncate flex-1"><%= record.destination %></span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-bold text-primary">¥<%= number_with_delimiter(record.amount) %></span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- PC：テーブル型 -->
+          <div class="overflow-x-auto hidden md:block">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th>出発日時</th>
@@ -52,7 +170,7 @@
               </thead>
               <tbody>
                 <% @recent_records.each do |record| %>
-                  <tr>
+                  <tr class="hover">
                     <td><%= record.departure_datetime.strftime("%Y/%m/%d %H:%M") %></td>
                     <td><%= record.store.name %></td>
                     <td><%= record.destination %></td>
@@ -64,8 +182,15 @@
             </table>
           </div>
         <% else %>
-          <p class="text-center text-gray-500 py-8">まだ運転記録がありません</p>
+          <div class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-base-content/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="text-base-content/50 text-sm">まだ運転記録がありません</p>
+            <p class="text-base-content/40 text-xs mt-1">右下のボタンから登録できます</p>
+          </div>
         <% end %>
+        </div>
       </div>
     </div>
   </div>

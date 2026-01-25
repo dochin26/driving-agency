@@ -8,8 +8,10 @@ import DrivingRecordFormController from "./driving_record_form_controller"
 import FlashController from "./flash_controller"
 import GeolocationController from "./geolocation_controller"
 import WaypointsController from "./waypoints_controller"
+import AmountCalculatorController from "./amount_calculator_controller"
 
 application.register("driving-record-form", DrivingRecordFormController)
 application.register("flash", FlashController)
 application.register("geolocation", GeolocationController)
 application.register("waypoints", WaypointsController)
+application.register("amount-calculator", AmountCalculatorController)

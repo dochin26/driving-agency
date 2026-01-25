@@ -1,16 +1,19 @@
 class DrivingRecord < ApplicationRecord
+  # Attribute types
+  attribute :status, :integer, default: 0
+
   # Enums
-  enum :status, { draft: 0, completed: 1 }, default: :draft
+  enum :status, { draft: 0, completed: 1 }
 
   # Associations
   belongs_to :driver
-  belongs_to :vehicle
+  belongs_to :vehicle, optional: true
   belongs_to :store, optional: true
   belongs_to :customer, optional: true
   has_many :waypoints, -> { order(:sequence) }, dependent: :destroy
 
   # Nested attributes for waypoints
-  accepts_nested_attributes_for :waypoints, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :waypoints, allow_destroy: true, reject_if: proc { |attributes| attributes["location"].blank? }
 
   # Validations
   validates :departure_datetime, presence: true
